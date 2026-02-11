@@ -156,7 +156,9 @@ export async function GET(request: NextRequest) {
         positions = await analyticsService.getOpenPositions(validatedQuery.walletId);
         if (!validatedQuery.status || validatedQuery.status === 'closed') {
           const closedPositions = await analyticsService.getClosedPositions(validatedQuery.walletId, positionFilters);
-          if (validatedQuery.status !== 'open') {
+          if (validatedQuery.status === 'closed') {
+            positions = closedPositions;
+          } else {
             positions = [...positions, ...closedPositions];
           }
         }
@@ -180,9 +182,12 @@ export async function GET(request: NextRequest) {
           walletPositions = await analyticsService.getPositionsBySymbol(wallet.id, validatedQuery.symbol, positionFilters);
         } else {
           const openPositions = await analyticsService.getOpenPositions(wallet.id);
-          if (!validatedQuery.status || validatedQuery.status === 'closed') {
+          if (!validatedQuery.status) {
             const closedPositions = await analyticsService.getClosedPositions(wallet.id, positionFilters);
-            walletPositions = validatedQuery.status === 'open' ? openPositions : [...openPositions, ...closedPositions];
+            walletPositions = [...openPositions, ...closedPositions];
+          } else if (validatedQuery.status === 'closed') {
+            const closedPositions = await analyticsService.getClosedPositions(wallet.id, positionFilters);
+            walletPositions = closedPositions;
           } else {
             walletPositions = openPositions;
           }

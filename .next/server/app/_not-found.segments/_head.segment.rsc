@@ -1,0 +1,5 @@
+1:"$Sreact.fragment"
+2:I[97367,["/_next/static/chunks/5196d392f79455a7.js","/_next/static/chunks/d2be314c3ece3fbe.js","/_next/static/chunks/1068761f0caf2e40.js","/_next/static/chunks/b4b28e020cf245fb.js"],"ViewportBoundary"]
+3:I[97367,["/_next/static/chunks/5196d392f79455a7.js","/_next/static/chunks/d2be314c3ece3fbe.js","/_next/static/chunks/1068761f0caf2e40.js","/_next/static/chunks/b4b28e020cf245fb.js"],"MetadataBoundary"]
+4:"$Sreact.suspense"
+0:{"buildId":"J1TGiL8kg7wGCenwJvkCK","rsc":["$","$1","h",{"children":[["$","meta",null,{"name":"robots","content":"noindex"}],["$","$L2",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$L3",null,{"children":["$","$4",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"ChainJournal"}],["$","meta","1",{"name":"description","content":"Professional crypto trading journal and analytics"}]]}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"loading":null,"isPartial":false}

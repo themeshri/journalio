@@ -1,0 +1,12 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/wallets/[walletId]/route": "app/api/wallets/[walletId]/route.js",
+  "/api/wallets/route": "app/api/wallets/route.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/wallet/[walletId]/page": "app/dashboard/wallet/[walletId]/page.js",
+  "/dashboard/wallets/add/page": "app/dashboard/wallets/add/page.js",
+  "/page": "app/page.js",
+  "/sign-in/[[...sign-in]]/page": "app/sign-in/[[...sign-in]]/page.js",
+  "/sign-up/[[...sign-up]]/page": "app/sign-up/[[...sign-up]]/page.js"
+}

@@ -1,0 +1,12 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/wallets/[walletId]/route": "/api/wallets/[walletId]",
+  "/api/wallets/route": "/api/wallets",
+  "/dashboard/page": "/dashboard",
+  "/dashboard/wallet/[walletId]/page": "/dashboard/wallet/[walletId]",
+  "/dashboard/wallets/add/page": "/dashboard/wallets/add",
+  "/page": "/",
+  "/sign-in/[[...sign-in]]/page": "/sign-in/[[...sign-in]]",
+  "/sign-up/[[...sign-up]]/page": "/sign-up/[[...sign-up]]"
+}

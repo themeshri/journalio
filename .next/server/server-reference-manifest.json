@@ -1,0 +1,405 @@
+{
+  "node": {
+    "006d7e0573f372f49958889e20f9e9e214c6812767": {
+      "workers": {
+        "app/_not-found/page": {
+          "moduleId": 38487,
+          "async": false,
+          "exportedName": "detectKeylessEnvDriftAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/dashboard/page": {
+          "moduleId": 68719,
+          "async": false,
+          "exportedName": "detectKeylessEnvDriftAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/dashboard/wallet/[walletId]/page": {
+          "moduleId": 71133,
+          "async": false,
+          "exportedName": "detectKeylessEnvDriftAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/dashboard/wallets/add/page": {
+          "moduleId": 30477,
+          "async": false,
+          "exportedName": "detectKeylessEnvDriftAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/page": {
+          "moduleId": 1470,
+          "async": false,
+          "exportedName": "detectKeylessEnvDriftAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/sign-in/[[...sign-in]]/page": {
+          "moduleId": 34164,
+          "async": false,
+          "exportedName": "detectKeylessEnvDriftAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/sign-up/[[...sign-up]]/page": {
+          "moduleId": 23196,
+          "async": false,
+          "exportedName": "detectKeylessEnvDriftAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        }
+      },
+      "layer": {
+        "app/_not-found/page": "rsc",
+        "app/dashboard/page": "rsc",
+        "app/dashboard/wallet/[walletId]/page": "rsc",
+        "app/dashboard/wallets/add/page": "rsc",
+        "app/page": "rsc",
+        "app/sign-in/[[...sign-in]]/page": "rsc",
+        "app/sign-up/[[...sign-up]]/page": "rsc"
+      },
+      "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js",
+      "exportedName": "detectKeylessEnvDriftAction"
+    },
+    "00f7edf9020aca3767b9aab680932c108f64db9659": {
+      "workers": {
+        "app/_not-found/page": {
+          "moduleId": 38487,
+          "async": false,
+          "exportedName": "invalidateCacheAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/server-actions.js"
+        },
+        "app/dashboard/page": {
+          "moduleId": 68719,
+          "async": false,
+          "exportedName": "invalidateCacheAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/server-actions.js"
+        },
+        "app/dashboard/wallet/[walletId]/page": {
+          "moduleId": 71133,
+          "async": false,
+          "exportedName": "invalidateCacheAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/server-actions.js"
+        },
+        "app/dashboard/wallets/add/page": {
+          "moduleId": 30477,
+          "async": false,
+          "exportedName": "invalidateCacheAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/server-actions.js"
+        },
+        "app/page": {
+          "moduleId": 1470,
+          "async": false,
+          "exportedName": "invalidateCacheAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/server-actions.js"
+        },
+        "app/sign-in/[[...sign-in]]/page": {
+          "moduleId": 34164,
+          "async": false,
+          "exportedName": "invalidateCacheAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/server-actions.js"
+        },
+        "app/sign-up/[[...sign-up]]/page": {
+          "moduleId": 23196,
+          "async": false,
+          "exportedName": "invalidateCacheAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/server-actions.js"
+        }
+      },
+      "layer": {
+        "app/_not-found/page": "action-browser",
+        "app/dashboard/page": "action-browser",
+        "app/dashboard/wallet/[walletId]/page": "action-browser",
+        "app/dashboard/wallets/add/page": "action-browser",
+        "app/page": "action-browser",
+        "app/sign-in/[[...sign-in]]/page": "action-browser",
+        "app/sign-up/[[...sign-up]]/page": "action-browser"
+      },
+      "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/server-actions.js",
+      "exportedName": "invalidateCacheAction"
+    },
+    "0017fb3060dfcb1008654002dfcc26d30f9172e70e": {
+      "workers": {
+        "app/_not-found/page": {
+          "moduleId": 38487,
+          "async": false,
+          "exportedName": "createOrReadKeylessAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/dashboard/page": {
+          "moduleId": 68719,
+          "async": false,
+          "exportedName": "createOrReadKeylessAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/dashboard/wallet/[walletId]/page": {
+          "moduleId": 71133,
+          "async": false,
+          "exportedName": "createOrReadKeylessAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/dashboard/wallets/add/page": {
+          "moduleId": 30477,
+          "async": false,
+          "exportedName": "createOrReadKeylessAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/page": {
+          "moduleId": 1470,
+          "async": false,
+          "exportedName": "createOrReadKeylessAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/sign-in/[[...sign-in]]/page": {
+          "moduleId": 34164,
+          "async": false,
+          "exportedName": "createOrReadKeylessAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/sign-up/[[...sign-up]]/page": {
+          "moduleId": 23196,
+          "async": false,
+          "exportedName": "createOrReadKeylessAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        }
+      },
+      "layer": {
+        "app/_not-found/page": "rsc",
+        "app/dashboard/page": "rsc",
+        "app/dashboard/wallet/[walletId]/page": "rsc",
+        "app/dashboard/wallets/add/page": "rsc",
+        "app/page": "rsc",
+        "app/sign-in/[[...sign-in]]/page": "rsc",
+        "app/sign-up/[[...sign-up]]/page": "rsc"
+      },
+      "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js",
+      "exportedName": "createOrReadKeylessAction"
+    },
+    "00705b3540fde76a8a8482e2fb22132a744045e9d5": {
+      "workers": {
+        "app/_not-found/page": {
+          "moduleId": 38487,
+          "async": false,
+          "exportedName": "collectKeylessMetadata",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js"
+        },
+        "app/dashboard/page": {
+          "moduleId": 68719,
+          "async": false,
+          "exportedName": "collectKeylessMetadata",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js"
+        },
+        "app/dashboard/wallet/[walletId]/page": {
+          "moduleId": 71133,
+          "async": false,
+          "exportedName": "collectKeylessMetadata",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js"
+        },
+        "app/dashboard/wallets/add/page": {
+          "moduleId": 30477,
+          "async": false,
+          "exportedName": "collectKeylessMetadata",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js"
+        },
+        "app/page": {
+          "moduleId": 1470,
+          "async": false,
+          "exportedName": "collectKeylessMetadata",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js"
+        },
+        "app/sign-in/[[...sign-in]]/page": {
+          "moduleId": 34164,
+          "async": false,
+          "exportedName": "collectKeylessMetadata",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js"
+        },
+        "app/sign-up/[[...sign-up]]/page": {
+          "moduleId": 23196,
+          "async": false,
+          "exportedName": "collectKeylessMetadata",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js"
+        }
+      },
+      "layer": {
+        "app/_not-found/page": "rsc",
+        "app/dashboard/page": "rsc",
+        "app/dashboard/wallet/[walletId]/page": "rsc",
+        "app/dashboard/wallets/add/page": "rsc",
+        "app/page": "rsc",
+        "app/sign-in/[[...sign-in]]/page": "rsc",
+        "app/sign-up/[[...sign-up]]/page": "rsc"
+      },
+      "filename": "node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js",
+      "exportedName": "collectKeylessMetadata"
+    },
+    "4072a3bdacb8d73c643a828c902eeaa0007a1b4876": {
+      "workers": {
+        "app/_not-found/page": {
+          "moduleId": 38487,
+          "async": false,
+          "exportedName": "formatMetadataHeaders",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js"
+        },
+        "app/dashboard/page": {
+          "moduleId": 68719,
+          "async": false,
+          "exportedName": "formatMetadataHeaders",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js"
+        },
+        "app/dashboard/wallet/[walletId]/page": {
+          "moduleId": 71133,
+          "async": false,
+          "exportedName": "formatMetadataHeaders",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js"
+        },
+        "app/dashboard/wallets/add/page": {
+          "moduleId": 30477,
+          "async": false,
+          "exportedName": "formatMetadataHeaders",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js"
+        },
+        "app/page": {
+          "moduleId": 1470,
+          "async": false,
+          "exportedName": "formatMetadataHeaders",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js"
+        },
+        "app/sign-in/[[...sign-in]]/page": {
+          "moduleId": 34164,
+          "async": false,
+          "exportedName": "formatMetadataHeaders",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js"
+        },
+        "app/sign-up/[[...sign-up]]/page": {
+          "moduleId": 23196,
+          "async": false,
+          "exportedName": "formatMetadataHeaders",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js"
+        }
+      },
+      "layer": {
+        "app/_not-found/page": "rsc",
+        "app/dashboard/page": "rsc",
+        "app/dashboard/wallet/[walletId]/page": "rsc",
+        "app/dashboard/wallets/add/page": "rsc",
+        "app/page": "rsc",
+        "app/sign-in/[[...sign-in]]/page": "rsc",
+        "app/sign-up/[[...sign-up]]/page": "rsc"
+      },
+      "filename": "node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js",
+      "exportedName": "formatMetadataHeaders"
+    },
+    "00b909681eaae310d31561f11dc416d5d5d9ed26ae": {
+      "workers": {
+        "app/_not-found/page": {
+          "moduleId": 38487,
+          "async": false,
+          "exportedName": "deleteKeylessAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/dashboard/page": {
+          "moduleId": 68719,
+          "async": false,
+          "exportedName": "deleteKeylessAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/dashboard/wallet/[walletId]/page": {
+          "moduleId": 71133,
+          "async": false,
+          "exportedName": "deleteKeylessAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/dashboard/wallets/add/page": {
+          "moduleId": 30477,
+          "async": false,
+          "exportedName": "deleteKeylessAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/page": {
+          "moduleId": 1470,
+          "async": false,
+          "exportedName": "deleteKeylessAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/sign-in/[[...sign-in]]/page": {
+          "moduleId": 34164,
+          "async": false,
+          "exportedName": "deleteKeylessAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/sign-up/[[...sign-up]]/page": {
+          "moduleId": 23196,
+          "async": false,
+          "exportedName": "deleteKeylessAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        }
+      },
+      "layer": {
+        "app/_not-found/page": "action-browser",
+        "app/dashboard/page": "action-browser",
+        "app/dashboard/wallet/[walletId]/page": "action-browser",
+        "app/dashboard/wallets/add/page": "action-browser",
+        "app/page": "action-browser",
+        "app/sign-in/[[...sign-in]]/page": "action-browser",
+        "app/sign-up/[[...sign-up]]/page": "action-browser"
+      },
+      "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js",
+      "exportedName": "deleteKeylessAction"
+    },
+    "406b228d4c209ab0dc0fc5b0f745c19d2d23a888ec": {
+      "workers": {
+        "app/_not-found/page": {
+          "moduleId": 38487,
+          "async": false,
+          "exportedName": "syncKeylessConfigAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/dashboard/page": {
+          "moduleId": 68719,
+          "async": false,
+          "exportedName": "syncKeylessConfigAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/dashboard/wallet/[walletId]/page": {
+          "moduleId": 71133,
+          "async": false,
+          "exportedName": "syncKeylessConfigAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/dashboard/wallets/add/page": {
+          "moduleId": 30477,
+          "async": false,
+          "exportedName": "syncKeylessConfigAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/page": {
+          "moduleId": 1470,
+          "async": false,
+          "exportedName": "syncKeylessConfigAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/sign-in/[[...sign-in]]/page": {
+          "moduleId": 34164,
+          "async": false,
+          "exportedName": "syncKeylessConfigAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        },
+        "app/sign-up/[[...sign-up]]/page": {
+          "moduleId": 23196,
+          "async": false,
+          "exportedName": "syncKeylessConfigAction",
+          "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js"
+        }
+      },
+      "layer": {
+        "app/_not-found/page": "action-browser",
+        "app/dashboard/page": "action-browser",
+        "app/dashboard/wallet/[walletId]/page": "action-browser",
+        "app/dashboard/wallets/add/page": "action-browser",
+        "app/page": "action-browser",
+        "app/sign-in/[[...sign-in]]/page": "action-browser",
+        "app/sign-up/[[...sign-up]]/page": "action-browser"
+      },
+      "filename": "node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js",
+      "exportedName": "syncKeylessConfigAction"
+    }
+  },
+  "edge": {},
+  "encryptionKey": "S4ct2EwzKEKYS4F0zW9UCjIisCuOidURGx0vSQ/0Onk="
+}

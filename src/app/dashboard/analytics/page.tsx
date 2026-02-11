@@ -1,9 +1,7 @@
 import { requireAuth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { analyticsService } from '@/lib/analytics';
-import { MetricsOverview } from '@/components/analytics/metrics-overview';
-import { PnLChart } from '@/components/analytics/pnl-chart';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AnalyticsDashboard } from '@/components/analytics/analytics-dashboard';
 
 export default async function AnalyticsPage() {
   const userId = await requireAuth();
@@ -76,32 +74,38 @@ export default async function AnalyticsPage() {
   // Get P&L breakdown for the first wallet (combined view will be enhanced in Phase 2)
   const pnlBreakdown = await analyticsService.calculatePnLBreakdown(wallets[0].id);
 
+  // Get initial trades data for the table
+  const initialTrades = await prisma.trade.findMany({
+    where: {
+      walletId: { in: wallets.map(w => w.id) },
+      processed: true
+    },
+    orderBy: { blockTime: 'desc' },
+    take: 50, // Initial load
+    select: {
+      id: true,
+      signature: true,
+      type: true,
+      tokenIn: true,
+      tokenOut: true,
+      amountIn: true,
+      amountOut: true,
+      priceIn: true,
+      priceOut: true,
+      dex: true,
+      fees: true,
+      blockTime: true,
+      processed: true,
+      error: true
+    }
+  });
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Analytics</h1>
-        <div className="text-sm text-muted-foreground">
-          Data from {wallets.length} wallet{wallets.length !== 1 ? 's' : ''}
-        </div>
-      </div>
-
-      <MetricsOverview metrics={combinedMetrics} />
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <PnLChart data={pnlBreakdown.daily} />
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Performing Tokens</CardTitle>
-            <CardDescription>Best tokens by P&L</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-muted-foreground">
-              Token performance analysis coming in Phase 2
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+    <AnalyticsDashboard
+      initialMetrics={combinedMetrics}
+      initialPnlData={pnlBreakdown.daily}
+      initialTrades={initialTrades}
+      walletCount={wallets.length}
+    />
   );
 }

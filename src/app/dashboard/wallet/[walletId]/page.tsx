@@ -5,17 +5,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { ImportTrigger } from '@/components/import/import-trigger';
 
 interface WalletPageProps {
-  params: { walletId: string };
+  params: Promise<{ walletId: string }>;
 }
 
 export default async function WalletPage({ params }: WalletPageProps) {
+  const { walletId } = await params;
   const userId = await requireAuth();
   
   const wallet = await prisma.wallet.findFirst({
     where: {
-      id: params.walletId,
+      id: walletId,
       userId,
       isActive: true
     },
@@ -87,6 +89,15 @@ export default async function WalletPage({ params }: WalletPageProps) {
         </Card>
       </div>
 
+      <ImportTrigger 
+        walletId={wallet.id}
+        walletAddress={wallet.address}
+        onImportComplete={() => {
+          // This will refresh the page to show updated trade counts
+          window.location.reload();
+        }}
+      />
+
       <Card>
         <CardHeader>
           <CardTitle>Trade History</CardTitle>
@@ -94,9 +105,14 @@ export default async function WalletPage({ params }: WalletPageProps) {
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-muted-foreground">
-            <p className="text-lg mb-2">No trades imported yet</p>
+            <p className="text-lg mb-2">
+              {wallet._count.trades > 0 ? `${wallet._count.trades} trades imported` : 'No trades imported yet'}
+            </p>
             <p className="text-sm">
-              Trade import functionality will be available in the next phase.
+              {wallet._count.trades > 0 
+                ? 'Trade details and analytics will be available in the next phase.' 
+                : 'Use the import tool above to fetch your trading history.'
+              }
             </p>
           </div>
         </CardContent>

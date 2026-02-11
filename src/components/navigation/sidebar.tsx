@@ -7,6 +7,7 @@ import {
   LayoutDashboard, 
   Wallet, 
   TrendingUp, 
+  Package,
   Download,
   Settings 
 } from 'lucide-react';
@@ -26,6 +27,11 @@ const navigation = [
     name: 'Analytics',
     href: '/dashboard/analytics', 
     icon: TrendingUp,
+  },
+  {
+    name: 'Positions',
+    href: '/dashboard/positions',
+    icon: Package,
   },
   {
     name: 'Import Trades',

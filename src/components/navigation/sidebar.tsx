@@ -9,7 +9,8 @@ import {
   TrendingUp, 
   Package,
   Download,
-  Settings 
+  Settings,
+  Activity
 } from 'lucide-react';
 
 const navigation = [
@@ -22,6 +23,11 @@ const navigation = [
     name: 'Wallets',
     href: '/dashboard/wallets',
     icon: Wallet,
+  },
+  {
+    name: 'Trades',
+    href: '/dashboard/trades',
+    icon: Activity,
   },
   {
     name: 'Analytics',

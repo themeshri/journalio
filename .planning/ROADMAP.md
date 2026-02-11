@@ -21,24 +21,25 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### Phase 1: Foundation & Import
 **Goal**: Users can securely add wallet addresses and automatically import their Solana trading history
 **Depends on**: Nothing (first phase)
-**Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06, WALL-01, WALL-02, WALL-03, WALL-04, WALL-05, TRAD-01, TRAD-02, TRAD-03, TRAD-04, TRAD-05
+**Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06, WALL-01, WALL-02, WALL-03, WALL-04, WALL-05, TRAD-01, TRAD-02, TRAD-03, TRAD-04, TRAD-05, ANAL-01, ANAL-02, ANAL-03, ANAL-04, ANAL-05
 **Success Criteria** (what must be TRUE):
   1. User can sign up and log in using X/Twitter, Google, or email/password
   2. User can add multiple Solana wallet addresses to their account (paste addresses)
   3. User can view separate dashboards for each wallet address
   4. System automatically imports and displays historical trades with accurate P&L
   5. User can manually trigger trade sync and stays logged in across devices
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
-- [ ] 01-03: TBD
+- [ ] 01-01-project-setup-auth.md — Next.js project setup with Clerk authentication and social logins
+- [ ] 01-02-database-wallet-management.md — PostgreSQL database and multi-wallet management system
+- [ ] 01-03-okx-api-trade-import.md — Solana trade import via OKX API and RPC with background processing
+- [ ] 01-04-dashboard-analytics.md — Professional analytics dashboard with P&L charts and trade filtering
 
 ### Phase 2: Analytics & Journaling
 **Goal**: Users can analyze their trading performance with advanced journaling and trade grouping
 **Depends on**: Phase 1
-**Requirements**: TRAD-06, TRAD-07, TRAD-08, ANAL-01, ANAL-02, ANAL-03, ANAL-04, ANAL-05, TGRP-01, TGRP-02, TGRP-03, JOUR-01, JOUR-02, JOUR-03, JOUR-04, JOUR-05, JOUR-06, JOUR-07, MIST-01, MIST-02, MIST-03, MIST-04
+**Requirements**: TRAD-06, TRAD-07, TRAD-08, TGRP-01, TGRP-02, TGRP-03, JOUR-01, JOUR-02, JOUR-03, JOUR-04, JOUR-05, JOUR-06, JOUR-07, MIST-01, MIST-02, MIST-03, MIST-04
 **Success Criteria** (what must be TRUE):
   1. User can view comprehensive P&L statistics and filter by multiple criteria
   2. System groups related buy/sell trades into positions for combined analysis
@@ -73,6 +74,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Import | 0/3 | Not started | - |
+| 1. Foundation & Import | 0/4 | Planned | - |
 | 2. Analytics & Journaling | 0/2 | Not started | - |
 | 3. Subscription Management | 0/1 | Not started | - |

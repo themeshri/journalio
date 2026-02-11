@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String
+  name      String?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  wallets   Wallet[]
+  
+  @@map("users")
+}
+
+model Wallet {
+  id        String   @id @default(cuid())
+  address   String
+  chain     String   @default("solana")
+  label     String?
+  isActive  Boolean  @default(true)
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trades Trade[]
+  
+  @@unique([userId, address, chain])
+  @@index([userId, isActive])
+  @@map("wallets")
+}
+
+model Trade {
+  id          String   @id @default(cuid())
+  signature   String   @unique
+  walletId    String
+  
+  type        String
+  tokenIn     String
+  tokenOut    String
+  amountIn    Decimal  @db.Decimal(20, 8)
+  amountOut   Decimal  @db.Decimal(20, 8)
+  priceIn     Decimal? @db.Decimal(20, 8)
+  priceOut    Decimal? @db.Decimal(20, 8)
+  
+  dex         String?
+  fees        Decimal  @default(0) @db.Decimal(10, 8)
+  blockTime   DateTime
+  slot        BigInt
+  
+  processed   Boolean  @default(false)
+  error       String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  
+  @@index([walletId, blockTime])
+  @@index([signature])
+  @@map("trades")
+}
+
+model ImportJob {
+  id          String   @id @default(cuid())
+  walletId    String
+  status      String
+  progress    Int      @default(0)
+  total       Int?
+  error       String?
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  
+  @@index([walletId, status])
+  @@map("import_jobs")
+}

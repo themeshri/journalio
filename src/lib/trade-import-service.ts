@@ -115,6 +115,10 @@ export class TradeImportService {
         }
       });
 
+      // Update wallet sync timestamp
+      const { SyncScheduler } = await import('./scheduler');
+      await SyncScheduler.scheduleWalletSync(job.walletId);
+
     } catch (error) {
       console.error(`Import job ${jobId} error:`, error);
       

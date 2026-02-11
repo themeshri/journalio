@@ -1,22 +1,10 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import { ClerkProvider } from '@clerk/nextjs'
-import './globals.css'
+'use client';
 
-const inter = Inter({ subsets: ['latin'] })
+import { ClerkProvider as BaseClerkProvider } from '@clerk/nextjs';
 
-export const metadata: Metadata = {
-  title: 'ChainJournal',
-  description: 'Professional crypto trading journal and analytics',
-}
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export function ClerkProvider({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider
+    <BaseClerkProvider
       appearance={{
         variables: {
           colorPrimary: "#0F172A",
@@ -35,14 +23,10 @@ export default function RootLayout({
       }}
       afterSignInUrl="/dashboard"
       afterSignUpUrl="/dashboard"
-      // Session synchronization is handled automatically by Clerk
+      // Enable session synchronization across devices
       publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
     >
-      <html lang="en">
-        <body className={inter.className}>
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
-  )
+      {children}
+    </BaseClerkProvider>
+  );
 }

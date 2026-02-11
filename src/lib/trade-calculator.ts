@@ -2,165 +2,106 @@ import { ParsedTrade } from '@/types/trade';
 
 export class TradeCalculator {
   /**
-   * Calculate realized P&L for a trade
-   * @param trade - Parsed trade data
-   * @param tokenInPrice - Price of token sold (in USD)
-   * @param tokenOutPrice - Price of token bought (in USD)
-   * @returns Realized P&L in USD
+   * Calculate P&L for a trade given token prices
    */
-  static calculateRealizedPnL(
-    trade: ParsedTrade,
-    tokenInPrice?: number,
-    tokenOutPrice?: number
-  ): {
-    pnlUsd?: number;
-    valueIn?: number;
-    valueOut?: number;
-    fees?: number;
+  static calculatePnL(trade: ParsedTrade, priceIn?: number, priceOut?: number): {
+    pnl: number;
+    pnlPercentage: number;
+    feesUSD: number;
+    totalValue: number;
   } {
-    const fees = parseFloat(trade.fees) * (tokenInPrice || 0); // Assuming fees in SOL, convert to USD
-
-    if (!tokenInPrice || !tokenOutPrice) {
-      return { fees };
-    }
-
     const amountIn = parseFloat(trade.amountIn);
     const amountOut = parseFloat(trade.amountOut);
+    const fees = parseFloat(trade.fees);
 
-    const valueIn = amountIn * tokenInPrice;
-    const valueOut = amountOut * tokenOutPrice;
+    // If we don't have prices, we can't calculate P&L
+    if (!priceIn || !priceOut) {
+      return {
+        pnl: 0,
+        pnlPercentage: 0,
+        feesUSD: 0,
+        totalValue: 0
+      };
+    }
 
-    // P&L = value received - value given - fees
-    const pnlUsd = valueOut - valueIn - fees;
+    const valueIn = amountIn * priceIn;
+    const valueOut = amountOut * priceOut;
+    const feesUSD = fees * 100; // Assuming SOL price around $100 for fees
+
+    const pnl = valueOut - valueIn - feesUSD;
+    const pnlPercentage = valueIn > 0 ? (pnl / valueIn) * 100 : 0;
 
     return {
-      pnlUsd,
-      valueIn,
-      valueOut,
-      fees
+      pnl,
+      pnlPercentage,
+      feesUSD,
+      totalValue: valueOut
     };
   }
 
   /**
-   * Calculate unrealized P&L for current holdings
-   * @param purchases - Array of purchase trades
-   * @param sales - Array of sale trades
-   * @param currentPrice - Current token price
-   * @returns Unrealized P&L data
+   * Calculate aggregate statistics for multiple trades
    */
-  static calculateUnrealizedPnL(
-    purchases: ParsedTrade[],
-    sales: ParsedTrade[],
-    currentPrice: number
-  ): {
-    remainingTokens: number;
-    averageCost: number;
-    unrealizedPnL: number;
-    currentValue: number;
-  } {
-    let totalTokensBought = 0;
-    let totalCostBasis = 0;
-
-    // Calculate total purchases
-    for (const purchase of purchases) {
-      const tokens = parseFloat(purchase.amountOut);
-      const cost = parseFloat(purchase.priceIn || '0') * parseFloat(purchase.amountIn);
-      
-      totalTokensBought += tokens;
-      totalCostBasis += cost;
-    }
-
-    // Calculate total sales
-    let totalTokensSold = 0;
-    for (const sale of sales) {
-      totalTokensSold += parseFloat(sale.amountIn);
-    }
-
-    const remainingTokens = totalTokensBought - totalTokensSold;
-    const averageCost = remainingTokens > 0 ? totalCostBasis / totalTokensBought : 0;
-    const currentValue = remainingTokens * currentPrice;
-    const costBasisRemaining = remainingTokens * averageCost;
-    const unrealizedPnL = currentValue - costBasisRemaining;
-
-    return {
-      remainingTokens,
-      averageCost,
-      unrealizedPnL,
-      currentValue
-    };
-  }
-
-  /**
-   * Calculate portfolio metrics
-   * @param trades - All trades for a wallet
-   * @param currentPrices - Current token prices
-   * @returns Portfolio performance metrics
-   */
-  static calculatePortfolioMetrics(
-    trades: ParsedTrade[],
-    currentPrices: Record<string, number>
-  ): {
-    totalRealizedPnL: number;
-    totalUnrealizedPnL: number;
-    totalPortfolioValue: number;
-    winRate: number;
+  static calculatePortfolioStats(trades: ParsedTrade[]): {
     totalTrades: number;
     winningTrades: number;
+    losingTrades: number;
+    winRate: number;
+    totalPnL: number;
+    totalFees: number;
+    totalVolume: number;
   } {
-    let totalRealizedPnL = 0;
-    let totalUnrealizedPnL = 0;
-    let winningTrades = 0;
-
-    const tokenHoldings: Record<string, ParsedTrade[]> = {};
-
-    // Group trades by token
-    for (const trade of trades) {
-      if (!trade.success) continue;
-
-      const token = trade.type === 'buy' ? trade.tokenOut : trade.tokenIn;
-      if (!tokenHoldings[token]) {
-        tokenHoldings[token] = [];
-      }
-      tokenHoldings[token].push(trade);
-    }
-
-    // Calculate P&L for each token
-    for (const [token, tokenTrades] of Object.entries(tokenHoldings)) {
-      const purchases = tokenTrades.filter(t => t.type === 'buy');
-      const sales = tokenTrades.filter(t => t.type === 'sell');
-
-      // Calculate realized P&L from sales
-      for (const sale of sales) {
-        const tokenInPrice = parseFloat(sale.priceIn || '0');
-        const tokenOutPrice = parseFloat(sale.priceOut || '0');
-        
-        if (tokenInPrice && tokenOutPrice) {
-          const { pnlUsd } = this.calculateRealizedPnL(sale, tokenInPrice, tokenOutPrice);
-          if (pnlUsd) {
-            totalRealizedPnL += pnlUsd;
-            if (pnlUsd > 0) winningTrades++;
-          }
-        }
-      }
-
-      // Calculate unrealized P&L for remaining holdings
-      const currentPrice = currentPrices[token];
-      if (currentPrice && purchases.length > 0) {
-        const { unrealizedPnL } = this.calculateUnrealizedPnL(purchases, sales, currentPrice);
-        totalUnrealizedPnL += unrealizedPnL;
-      }
-    }
-
-    const totalTrades = trades.filter(t => t.success && (t.type === 'buy' || t.type === 'sell')).length;
-    const winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0;
-
-    return {
-      totalRealizedPnL,
-      totalUnrealizedPnL,
-      totalPortfolioValue: totalRealizedPnL + totalUnrealizedPnL,
-      winRate,
-      totalTrades,
-      winningTrades
+    const stats = {
+      totalTrades: trades.length,
+      winningTrades: 0,
+      losingTrades: 0,
+      winRate: 0,
+      totalPnL: 0,
+      totalFees: 0,
+      totalVolume: 0
     };
+
+    for (const trade of trades) {
+      const priceIn = trade.priceIn ? parseFloat(trade.priceIn) : 0;
+      const priceOut = trade.priceOut ? parseFloat(trade.priceOut) : 0;
+      
+      if (priceIn && priceOut) {
+        const pnl = this.calculatePnL(trade, priceIn, priceOut);
+        
+        if (pnl.pnl > 0) {
+          stats.winningTrades++;
+        } else if (pnl.pnl < 0) {
+          stats.losingTrades++;
+        }
+
+        stats.totalPnL += pnl.pnl;
+        stats.totalFees += pnl.feesUSD;
+        stats.totalVolume += pnl.totalValue;
+      }
+    }
+
+    stats.winRate = stats.totalTrades > 0 ? 
+      (stats.winningTrades / stats.totalTrades) * 100 : 0;
+
+    return stats;
+  }
+
+  /**
+   * Format currency values for display
+   */
+  static formatCurrency(value: number, currency = 'USD'): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value);
+  }
+
+  /**
+   * Format percentage for display
+   */
+  static formatPercentage(value: number, decimals = 2): string {
+    return `${value.toFixed(decimals)}%`;
   }
 }

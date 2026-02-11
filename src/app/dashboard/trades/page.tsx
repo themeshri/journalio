@@ -51,7 +51,7 @@ export default function TradesPage() {
   const loadTrades = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/trades/simple');
+      const response = await fetch('/api/trades');
       if (response.ok) {
         const data = await response.json();
         setTrades(data.trades || []);

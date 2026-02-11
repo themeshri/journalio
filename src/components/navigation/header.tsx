@@ -1,6 +1,7 @@
 'use client';
 
 import { UserProfile } from '@/components/auth/user-profile';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export function Header() {
   return (
@@ -11,6 +12,7 @@ export function Header() {
         </div>
         
         <div className="flex items-center space-x-4">
+          <ThemeToggle />
           <UserProfile />
         </div>
       </div>

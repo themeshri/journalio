@@ -34,7 +34,7 @@ export default function AnalyticsPage() {
 
   const loadTrades = async () => {
     try {
-      const response = await fetch('/api/trades/simple');
+      const response = await fetch('/api/trades');
       if (response.ok) {
         const data = await response.json();
         setTrades(data.trades || []);

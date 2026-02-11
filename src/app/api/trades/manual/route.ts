@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { PrismaClient } from '@prisma/client';
 import { ManualTradeInput, TradeSource, TradeActionType } from '@/types/trade';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/db';
 
 // Manual trade validation schema
 const manualTradeSchema = z.object({

@@ -4,7 +4,7 @@ export class TradeCalculator {
   /**
    * Calculate P&L for a trade given token prices
    */
-  static calculatePnL(trade: ParsedTrade, priceIn?: number, priceOut?: number): {
+  static calculatePnL(trade: ParsedTrade, priceIn?: number, priceOut?: number, solPrice?: number): {
     pnl: number;
     pnlPercentage: number;
     feesUSD: number;
@@ -26,7 +26,21 @@ export class TradeCalculator {
 
     const valueIn = amountIn * priceIn;
     const valueOut = amountOut * priceOut;
-    const feesUSD = fees * 100; // Assuming SOL price around $100 for fees
+    // Use actual SOL price for fee calculation
+    // On Solana, transaction fees are paid in SOL, so we use SOL price
+    // If no SOL price provided, try to use priceIn/priceOut if one of the tokens is SOL
+    let feeTokenPrice = solPrice;
+    if (!feeTokenPrice) {
+      if (trade.tokenIn.toUpperCase() === 'SOL') {
+        feeTokenPrice = priceIn;
+      } else if (trade.tokenOut.toUpperCase() === 'SOL') {
+        feeTokenPrice = priceOut;
+      } else {
+        // Last resort - use estimated SOL price
+        feeTokenPrice = 100;
+      }
+    }
+    const feesUSD = fees * feeTokenPrice;
 
     const pnl = valueOut - valueIn - feesUSD;
     const pnlPercentage = valueIn > 0 ? (pnl / valueIn) * 100 : 0;
@@ -42,7 +56,7 @@ export class TradeCalculator {
   /**
    * Calculate aggregate statistics for multiple trades
    */
-  static calculatePortfolioStats(trades: ParsedTrade[]): {
+  static calculatePortfolioStats(trades: ParsedTrade[], solPrice?: number): {
     totalTrades: number;
     winningTrades: number;
     losingTrades: number;
@@ -66,7 +80,7 @@ export class TradeCalculator {
       const priceOut = trade.priceOut ? parseFloat(trade.priceOut) : 0;
       
       if (priceIn && priceOut) {
-        const pnl = this.calculatePnL(trade, priceIn, priceOut);
+        const pnl = this.calculatePnL(trade, priceIn, priceOut, solPrice);
         
         if (pnl.pnl > 0) {
           stats.winningTrades++;

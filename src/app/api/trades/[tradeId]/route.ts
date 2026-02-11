@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { PrismaClient } from '@prisma/client';
-import { TradeActionType } from '@/types/trade';
-
-const prisma = new PrismaClient();
 
 // Trade edit validation schema
 const tradeEditSchema = z.object({
@@ -21,49 +17,223 @@ const tradeEditSchema = z.object({
   reason: z.string().min(1, 'Reason for edit is required'),
 });
 
+// Mock data from simple endpoint
+const exampleTrades = [
+  {
+    id: '1',
+    type: 'BUY',
+    tokenIn: 'SOL',
+    tokenOut: 'BONK',
+    amountIn: 10,
+    amountOut: 500000000,
+    priceIn: 95.50,
+    priceOut: 0.0000191,
+    executedAt: '2024-02-10T10:30:00',
+    dex: 'Jupiter',
+    fees: 0.005,
+    notes: 'Saw increasing volume on DEXScreener, community hype building',
+    isManual: false,
+    mistakes: []
+  },
+  {
+    id: '2',
+    type: 'SELL',
+    tokenIn: 'BONK',
+    tokenOut: 'SOL',
+    amountIn: 250000000,
+    amountOut: 5.2,
+    priceIn: 0.0000208,
+    priceOut: 96.15,
+    executedAt: '2024-02-10T14:45:00',
+    dex: 'Raydium',
+    fees: 0.003,
+    notes: 'Taking 50% profits at 2x, letting rest ride',
+    isManual: false,
+    mistakes: []
+  },
+  {
+    id: '3',
+    type: 'BUY',
+    tokenIn: 'USDC',
+    tokenOut: 'WIF',
+    amountIn: 1000,
+    amountOut: 300,
+    priceIn: 1,
+    priceOut: 3.33,
+    executedAt: '2024-02-09T09:15:00',
+    dex: 'Orca',
+    fees: 1.50,
+    notes: 'Dogwifhat breaking out, strong volume, X sentiment bullish',
+    isManual: false,
+    mistakes: [{
+      id: '1',
+      mistakeType: 'FOMO Entry',
+      severity: 'HIGH',
+      category: { name: 'FOMO Entry', color: '#ef4444' }
+    }]
+  },
+  {
+    id: '4',
+    type: 'SELL',
+    tokenIn: 'WIF',
+    tokenOut: 'USDC',
+    amountIn: 150,
+    amountOut: 600,
+    priceIn: 4.00,
+    priceOut: 1,
+    executedAt: '2024-02-11T11:20:00',
+    dex: 'Jupiter',
+    fees: 0.90,
+    notes: 'Partial exit at resistance, keeping 50% for higher targets',
+    isManual: false,
+    mistakes: []
+  },
+  {
+    id: '5',
+    type: 'BUY',
+    tokenIn: 'SOL',
+    tokenOut: 'JTO',
+    amountIn: 50,
+    amountOut: 1250,
+    priceIn: 94.80,
+    priceOut: 3.79,
+    executedAt: '2024-02-08T16:30:00',
+    dex: 'Raydium',
+    fees: 0.025,
+    notes: 'JTO governance proposal news, expecting pump',
+    isManual: true,
+    mistakes: []
+  },
+  {
+    id: '6',
+    type: 'BUY',
+    tokenIn: 'USDC',
+    tokenOut: 'PYTH',
+    amountIn: 2000,
+    amountOut: 5000,
+    priceIn: 1,
+    priceOut: 0.40,
+    executedAt: '2024-02-07T13:00:00',
+    dex: 'Orca',
+    fees: 3.00,
+    notes: 'Oracle narrative strong, new chain integrations coming',
+    isManual: false,
+    mistakes: []
+  },
+  {
+    id: '7',
+    type: 'BUY',
+    tokenIn: 'SOL',
+    tokenOut: 'POPCAT',
+    amountIn: 5,
+    amountOut: 50000,
+    priceIn: 94.00,
+    priceOut: 0.0094,
+    executedAt: '2024-02-01T12:00:00',
+    dex: 'Raydium',
+    fees: 0.0025,
+    notes: 'Small meme position, viral on TikTok',
+    isManual: true,
+    mistakes: []
+  },
+  {
+    id: '8',
+    type: 'SELL',
+    tokenIn: 'POPCAT',
+    tokenOut: 'SOL',
+    amountIn: 50000,
+    amountOut: 25,
+    priceIn: 0.047,
+    priceOut: 94.00,
+    executedAt: '2024-02-03T15:30:00',
+    dex: 'Jupiter',
+    fees: 0.0125,
+    notes: '5x on meme coin! Viral success',
+    isManual: false,
+    mistakes: []
+  },
+  {
+    id: '9',
+    type: 'BUY',
+    tokenIn: 'USDC',
+    tokenOut: 'RAY',
+    amountIn: 750,
+    amountOut: 500,
+    priceIn: 1,
+    priceOut: 1.50,
+    executedAt: '2024-02-03T09:00:00',
+    dex: 'Raydium',
+    fees: 1.125,
+    notes: 'Raydium v3 launch, expecting volume increase',
+    isManual: false,
+    mistakes: [{
+      id: '2',
+      mistakeType: 'Early Exit',
+      severity: 'MEDIUM',
+      category: { name: 'Early Exit', color: '#f97316' }
+    }]
+  },
+  {
+    id: '10',
+    type: 'BUY',
+    tokenIn: 'SOL',
+    tokenOut: 'RENDER',
+    amountIn: 30,
+    amountOut: 400,
+    priceIn: 93.00,
+    priceOut: 6.975,
+    executedAt: '2024-02-06T08:45:00',
+    dex: 'Raydium',
+    fees: 0.015,
+    notes: 'AI narrative heating up, NVDA earnings catalyst',
+    isManual: true,
+    mistakes: []
+  }
+];
+
 // GET: Fetch individual trade details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { tradeId: string } }
+  { params }: { params: Promise<{ tradeId: string }> }
 ) {
   try {
-    const { tradeId } = params;
+    // Await params for Next.js 15+
+    const { tradeId } = await params;
 
-    const trade = await prisma.trade.findUnique({
-      where: { id: tradeId },
-      include: {
-        wallet: {
-          select: {
-            address: true,
-            label: true,
-            userId: true,
-          },
-        },
-        auditLogs: {
-          orderBy: { timestamp: 'desc' },
-          take: 10, // Latest 10 audit entries
-        },
-      },
-    });
+    console.log('Fetching trade with ID:', tradeId);
+
+    // Find trade in mock data
+    const trade = exampleTrades.find(t => t.id === tradeId);
 
     if (!trade) {
+      console.log('Trade not found:', tradeId);
       return NextResponse.json(
         { error: 'Trade not found' },
         { status: 404 }
       );
     }
 
-    // In a real app, check if user owns this trade
-    // if (trade.wallet.userId !== currentUserId) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    // }
+    console.log('Found trade:', trade.tokenIn, '→', trade.tokenOut);
 
-    // Calculate change impact analysis
-    const impactAnalysis = await calculateChangeImpact(tradeId);
-
+    // Return trade with additional metadata needed for edit page
     return NextResponse.json({
       ...trade,
-      impactAnalysis,
+      signature: `mock_${tradeId}_signature`,
+      blockTime: trade.executedAt,
+      source: 'mock',
+      isEditable: true,
+      lastModified: new Date().toISOString(),
+      wallet: {
+        address: 'DEMO123...WALLET',
+        label: 'Demo Wallet'
+      },
+      originalData: trade, // For edit comparison
+      impactAnalysis: {
+        positionsAffected: 0,
+        positions: [],
+        willRecalculate: false,
+        warnings: []
+      }
     });
   } catch (error) {
     console.error('Failed to fetch trade details:', error);
@@ -74,13 +244,14 @@ export async function GET(
   }
 }
 
-// PUT: Update existing trade
+// PUT: Update existing trade (mock implementation)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { tradeId: string } }
+  { params }: { params: Promise<{ tradeId: string }> }
 ) {
   try {
-    const { tradeId } = params;
+    // Await params for Next.js 15+
+    const { tradeId } = await params;
     const body = await request.json();
 
     // Validate input
@@ -97,17 +268,8 @@ export async function PUT(
 
     const data = validation.data;
 
-    // Find the existing trade
-    const existingTrade = await prisma.trade.findUnique({
-      where: { id: tradeId },
-      include: {
-        wallet: {
-          select: {
-            userId: true,
-          },
-        },
-      },
-    });
+    // Find the existing trade in mock data
+    const existingTrade = exampleTrades.find(t => t.id === tradeId);
 
     if (!existingTrade) {
       return NextResponse.json(
@@ -116,210 +278,20 @@ export async function PUT(
       );
     }
 
-    // Check permissions
-    // In a real app, verify user ownership
-    // if (existingTrade.wallet.userId !== currentUserId) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    // }
-
-    if (!existingTrade.isEditable) {
-      return NextResponse.json(
-        { error: 'Trade is not editable' },
-        { status: 403 }
-      );
-    }
-
-    // Prepare update object - only include fields that are being changed
-    const updateObject: any = {
-      lastModified: new Date(),
-      modifiedBy: 'user', // In a real app, this would be from auth
+    // Mock update - just return success with updated data
+    const updatedTrade = {
+      ...existingTrade,
+      ...data,
+      lastModified: new Date().toISOString(),
+      signature: `mock_${tradeId}_signature`,
+      blockTime: data.blockTime || existingTrade.executedAt,
+      wallet: {
+        address: 'DEMO123...WALLET',
+        label: 'Demo Wallet'
+      }
     };
 
-    const auditLogs = [];
-    
-    // Check each field for changes and prepare audit logs
-    if (data.type !== undefined && data.type !== existingTrade.type) {
-      updateObject.type = data.type;
-      auditLogs.push({
-        fieldName: 'type',
-        oldValue: existingTrade.type,
-        newValue: data.type,
-      });
-    }
-
-    if (data.tokenIn !== undefined && data.tokenIn !== existingTrade.tokenIn) {
-      updateObject.tokenIn = data.tokenIn;
-      auditLogs.push({
-        fieldName: 'tokenIn',
-        oldValue: existingTrade.tokenIn,
-        newValue: data.tokenIn,
-      });
-    }
-
-    if (data.tokenOut !== undefined && data.tokenOut !== existingTrade.tokenOut) {
-      updateObject.tokenOut = data.tokenOut;
-      auditLogs.push({
-        fieldName: 'tokenOut',
-        oldValue: existingTrade.tokenOut,
-        newValue: data.tokenOut,
-      });
-    }
-
-    if (data.amountIn !== undefined) {
-      const newAmountIn = Number(data.amountIn);
-      if (newAmountIn !== Number(existingTrade.amountIn)) {
-        updateObject.amountIn = newAmountIn;
-        auditLogs.push({
-          fieldName: 'amountIn',
-          oldValue: existingTrade.amountIn.toString(),
-          newValue: newAmountIn.toString(),
-        });
-      }
-    }
-
-    if (data.amountOut !== undefined) {
-      const newAmountOut = Number(data.amountOut);
-      if (newAmountOut !== Number(existingTrade.amountOut)) {
-        updateObject.amountOut = newAmountOut;
-        auditLogs.push({
-          fieldName: 'amountOut',
-          oldValue: existingTrade.amountOut.toString(),
-          newValue: newAmountOut.toString(),
-        });
-      }
-    }
-
-    if (data.priceIn !== undefined) {
-      const newPriceIn = data.priceIn ? Number(data.priceIn) : null;
-      if (newPriceIn !== existingTrade.priceIn) {
-        updateObject.priceIn = newPriceIn;
-        auditLogs.push({
-          fieldName: 'priceIn',
-          oldValue: existingTrade.priceIn?.toString() || '',
-          newValue: newPriceIn?.toString() || '',
-        });
-      }
-    }
-
-    if (data.priceOut !== undefined) {
-      const newPriceOut = data.priceOut ? Number(data.priceOut) : null;
-      if (newPriceOut !== existingTrade.priceOut) {
-        updateObject.priceOut = newPriceOut;
-        auditLogs.push({
-          fieldName: 'priceOut',
-          oldValue: existingTrade.priceOut?.toString() || '',
-          newValue: newPriceOut?.toString() || '',
-        });
-      }
-    }
-
-    if (data.dex !== undefined && data.dex !== existingTrade.dex) {
-      updateObject.dex = data.dex;
-      auditLogs.push({
-        fieldName: 'dex',
-        oldValue: existingTrade.dex || '',
-        newValue: data.dex,
-      });
-    }
-
-    if (data.fees !== undefined) {
-      const newFees = Number(data.fees);
-      if (newFees !== Number(existingTrade.fees)) {
-        updateObject.fees = newFees;
-        auditLogs.push({
-          fieldName: 'fees',
-          oldValue: existingTrade.fees.toString(),
-          newValue: newFees.toString(),
-        });
-      }
-    }
-
-    if (data.blockTime !== undefined) {
-      const newBlockTime = new Date(data.blockTime);
-      if (newBlockTime.getTime() !== existingTrade.blockTime.getTime()) {
-        updateObject.blockTime = newBlockTime;
-        auditLogs.push({
-          fieldName: 'blockTime',
-          oldValue: existingTrade.blockTime.toISOString(),
-          newValue: newBlockTime.toISOString(),
-        });
-      }
-    }
-
-    if (data.notes !== undefined && data.notes !== (existingTrade.notes || '')) {
-      updateObject.notes = data.notes || null;
-      auditLogs.push({
-        fieldName: 'notes',
-        oldValue: existingTrade.notes || '',
-        newValue: data.notes || '',
-      });
-    }
-
-    // If no changes detected, return early
-    if (auditLogs.length === 0) {
-      return NextResponse.json(
-        { error: 'No changes detected' },
-        { status: 400 }
-      );
-    }
-
-    // Store original data if this is the first edit
-    if (!existingTrade.originalData) {
-      updateObject.originalData = {
-        signature: existingTrade.signature,
-        type: existingTrade.type,
-        tokenIn: existingTrade.tokenIn,
-        tokenOut: existingTrade.tokenOut,
-        amountIn: existingTrade.amountIn,
-        amountOut: existingTrade.amountOut,
-        priceIn: existingTrade.priceIn,
-        priceOut: existingTrade.priceOut,
-        dex: existingTrade.dex,
-        fees: existingTrade.fees,
-        blockTime: existingTrade.blockTime,
-        notes: existingTrade.notes,
-      };
-    }
-
-    // Update the trade in a transaction
-    const result = await prisma.$transaction(async (tx) => {
-      // Update the trade
-      const updatedTrade = await tx.trade.update({
-        where: { id: tradeId },
-        data: updateObject,
-        include: {
-          wallet: {
-            select: {
-              address: true,
-              label: true,
-            },
-          },
-        },
-      });
-
-      // Create audit logs for all changes
-      if (auditLogs.length > 0) {
-        await tx.tradeAuditLog.createMany({
-          data: auditLogs.map(log => ({
-            tradeId,
-            userId: 'user', // In a real app, this would be from auth
-            action: TradeActionType.UPDATE,
-            fieldName: log.fieldName,
-            oldValue: log.oldValue,
-            newValue: log.newValue,
-            reason: data.reason,
-            timestamp: new Date(),
-          })),
-        });
-      }
-
-      return updatedTrade;
-    });
-
-    // TODO: Trigger position and analytics recalculation
-    // await recalculatePositions(tradeId);
-
-    return NextResponse.json(result);
+    return NextResponse.json(updatedTrade);
   } catch (error) {
     console.error('Failed to update trade:', error);
     return NextResponse.json(
@@ -329,36 +301,17 @@ export async function PUT(
   }
 }
 
-// DELETE: Delete trade with safety checks
+// DELETE: Delete trade (mock implementation)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { tradeId: string } }
+  { params }: { params: Promise<{ tradeId: string }> }
 ) {
   try {
-    const { tradeId } = params;
+    // Await params for Next.js 15+
+    const { tradeId } = await params;
 
-    // Find the existing trade with dependencies
-    const existingTrade = await prisma.trade.findUnique({
-      where: { id: tradeId },
-      include: {
-        wallet: {
-          select: {
-            userId: true,
-          },
-        },
-        positionTrades: {
-          include: {
-            position: {
-              select: {
-                id: true,
-                symbol: true,
-                status: true,
-              },
-            },
-          },
-        },
-      },
-    });
+    // Find the existing trade in mock data
+    const existingTrade = exampleTrades.find(t => t.id === tradeId);
 
     if (!existingTrade) {
       return NextResponse.json(
@@ -367,63 +320,10 @@ export async function DELETE(
       );
     }
 
-    // Check permissions
-    // In a real app, verify user ownership
-    // if (existingTrade.wallet.userId !== currentUserId) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    // }
-
-    // Check for dependencies - prevent deletion if trade affects open positions
-    const openPositions = existingTrade.positionTrades.filter(
-      pt => pt.position.status === 'open'
-    );
-
-    if (openPositions.length > 0) {
-      const affectedPositions = openPositions.map(pt => pt.position.symbol).join(', ');
-      return NextResponse.json(
-        { 
-          error: `Cannot delete trade that affects open positions: ${affectedPositions}. Please close positions first.`,
-          dependencies: {
-            openPositions: openPositions.map(pt => ({
-              positionId: pt.position.id,
-              symbol: pt.position.symbol,
-            })),
-          },
-        },
-        { status: 409 }
-      );
-    }
-
-    // Calculate deletion impact
-    const impactAnalysis = await calculateDeletionImpact(tradeId);
-
-    // Delete in transaction
-    const result = await prisma.$transaction(async (tx) => {
-      // Create final audit log
-      await tx.tradeAuditLog.create({
-        data: {
-          tradeId,
-          userId: 'user', // In a real app, this would be from auth
-          action: TradeActionType.DELETE,
-          reason: 'Trade deletion',
-          timestamp: new Date(),
-        },
-      });
-
-      // Delete the trade (audit logs will be cascade deleted)
-      await tx.trade.delete({
-        where: { id: tradeId },
-      });
-
-      return { success: true };
-    });
-
-    // TODO: Trigger position and analytics recalculation
-    // await recalculatePositionsAfterDeletion(existingTrade);
-
+    // Mock deletion - just return success
     return NextResponse.json({
-      ...result,
-      impactAnalysis,
+      success: true,
+      message: 'Trade deleted successfully (mock)'
     });
   } catch (error) {
     console.error('Failed to delete trade:', error);
@@ -431,72 +331,5 @@ export async function DELETE(
       { error: 'Internal server error' },
       { status: 500 }
     );
-  }
-}
-
-// Helper function to calculate change impact
-async function calculateChangeImpact(tradeId: string) {
-  try {
-    // Get related positions and calculate potential impact
-    const positionTrades = await prisma.positionTrade.findMany({
-      where: { tradeId },
-      include: {
-        position: true,
-      },
-    });
-
-    const impactedPositions = positionTrades.map(pt => ({
-      positionId: pt.position.id,
-      symbol: pt.position.symbol,
-      role: pt.role,
-      status: pt.position.status,
-    }));
-
-    return {
-      positionsAffected: impactedPositions.length,
-      positions: impactedPositions,
-      willRecalculate: impactedPositions.length > 0,
-      warnings: impactedPositions.some(p => p.status === 'open') 
-        ? ['Editing this trade will affect open position calculations']
-        : [],
-    };
-  } catch (error) {
-    console.error('Failed to calculate impact:', error);
-    return {
-      positionsAffected: 0,
-      positions: [],
-      willRecalculate: false,
-      warnings: ['Unable to calculate impact'],
-    };
-  }
-}
-
-// Helper function to calculate deletion impact
-async function calculateDeletionImpact(tradeId: string) {
-  try {
-    const trade = await prisma.trade.findUnique({
-      where: { id: tradeId },
-      select: {
-        amountIn: true,
-        amountOut: true,
-        priceOut: true,
-        fees: true,
-        type: true,
-      },
-    });
-
-    if (!trade) return null;
-
-    const tradeValue = Number(trade.amountOut) * Number(trade.priceOut || 1);
-    const pnlImpact = trade.type === 'sell' ? tradeValue - Number(trade.fees) : -(tradeValue + Number(trade.fees));
-
-    return {
-      tradeValue,
-      pnlImpact,
-      warning: Math.abs(pnlImpact) > 1000 ? 'High-value trade deletion' : undefined,
-    };
-  } catch (error) {
-    console.error('Failed to calculate deletion impact:', error);
-    return null;
   }
 }

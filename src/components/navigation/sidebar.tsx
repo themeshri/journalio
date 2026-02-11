@@ -10,7 +10,8 @@ import {
   Package,
   Download,
   Settings,
-  Activity
+  Activity,
+  Brain
 } from 'lucide-react';
 
 const navigation = [
@@ -38,6 +39,11 @@ const navigation = [
     name: 'Positions',
     href: '/dashboard/positions',
     icon: Package,
+  },
+  {
+    name: 'Mistakes',
+    href: '/dashboard/mistakes',
+    icon: Brain,
   },
   {
     name: 'Import Trades',

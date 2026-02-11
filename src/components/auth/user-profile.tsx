@@ -1,25 +1,16 @@
 'use client';
 
-import { UserButton } from '@clerk/nextjs';
-import { useUser } from '@clerk/nextjs';
-
+// Development mode - bypass Clerk entirely
 export function UserProfile() {
-  const { user } = useUser();
-  
   return (
     <div className="flex items-center gap-3">
       <div className="text-sm">
-        <p className="font-medium">{user?.fullName}</p>
-        <p className="text-muted-foreground">{user?.emailAddresses[0]?.emailAddress}</p>
+        <p className="font-medium">Dev User</p>
+        <p className="text-muted-foreground">dev@chainjournal.com</p>
       </div>
-      <UserButton 
-        afterSignOutUrl="/"
-        appearance={{
-          elements: {
-            avatarBox: "h-8 w-8"
-          }
-        }}
-      />
+      <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
+        <span className="text-sm font-medium">DU</span>
+      </div>
     </div>
   );
 }

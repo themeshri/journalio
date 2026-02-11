@@ -11,6 +11,8 @@ export interface TradeMetrics {
   biggestLoss: number;
   profitFactor: number;
   avgHoldTime: number;
+  mistakeCount?: number;
+  mistakeRate?: number;
 }
 
 export interface PnLBreakdown {

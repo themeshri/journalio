@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -33,14 +33,14 @@ interface TradeMetadata {
 }
 
 interface EditTradePageProps {
-  params: {
+  params: Promise<{
     tradeId: string;
-  };
+  }>;
 }
 
 export default function EditTradePage({ params }: EditTradePageProps) {
   const router = useRouter();
-  const { tradeId } = params;
+  const { tradeId } = use(params);
   const [isLoading, setIsLoading] = useState(true);
   const [tradeMetadata, setTradeMetadata] = useState<TradeMetadata | null>(null);
   const [error, setError] = useState<string | null>(null);

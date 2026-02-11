@@ -1,8 +1,9 @@
 import { prisma } from './db';
 import { TradeMetrics, PnLBreakdown, TokenPerformance, TradeFilter } from '@/types/analytics';
 import { Position, PositionMetrics, PositionFilter, TradeForPosition, PositionSummary } from '@/types/position';
+import { MistakeAnalytics, MistakeFilter, MistakeTrend, MistakeCategoryEnum, MistakeSeverity, EmotionalState } from '@/types/mistake';
 import { calculateFIFOPositions, groupTradesIntoPositions } from './algorithms/position-tracker';
-import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, format } from 'date-fns';
+import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, format, subDays, subWeeks, subMonths } from 'date-fns';
 
 export class AnalyticsService {
   async calculateWalletMetrics(walletId: string, filters?: TradeFilter): Promise<TradeMetrics> {
@@ -31,6 +32,10 @@ export class AnalyticsService {
     const totalWinAmount = winPnLs.reduce((sum, pnl) => sum + pnl, 0);
     const totalLossAmount = lossPnLs.reduce((sum, pnl) => sum + Math.abs(pnl), 0);
 
+    // Calculate mistake-related metrics
+    const mistakeCount = await this.getMistakeCount(trades.map(t => t.id));
+    const mistakeRate = trades.length > 0 ? (mistakeCount / trades.length) * 100 : 0;
+
     return {
       totalPnL,
       totalVolume,
@@ -43,7 +48,9 @@ export class AnalyticsService {
       biggestWin: winPnLs.length > 0 ? Math.max(...winPnLs) : 0,
       biggestLoss: lossPnLs.length > 0 ? Math.min(...lossPnLs) : 0,
       profitFactor: totalLossAmount > 0 ? totalWinAmount / totalLossAmount : totalWinAmount > 0 ? 1 : 0,
-      avgHoldTime: await this.calculateAverageHoldTime(trades)
+      avgHoldTime: await this.calculateAverageHoldTime(trades),
+      mistakeCount,
+      mistakeRate
     };
   }
 
@@ -101,6 +108,305 @@ export class AnalyticsService {
     }
 
     return performance.sort((a, b) => b.totalPnL - a.totalPnL);
+  }
+
+  /**
+   * Get comprehensive mistake analytics for a user
+   */
+  async getMistakeAnalytics(userId: string, filters?: MistakeFilter): Promise<MistakeAnalytics> {
+    // Get all trades with mistakes for the user
+    const whereCondition: any = {
+      trade: {
+        wallet: {
+          userId: userId
+        }
+      }
+    };
+
+    if (filters) {
+      if (filters.category) {
+        whereCondition.category = filters.category;
+      }
+      if (filters.severity) {
+        whereCondition.severity = filters.severity;
+      }
+      if (filters.emotionalState) {
+        whereCondition.emotionalState = filters.emotionalState;
+      }
+      if (filters.startDate && filters.endDate) {
+        whereCondition.createdAt = {
+          gte: filters.startDate,
+          lte: filters.endDate
+        };
+      }
+      if (filters.tradeId) {
+        whereCondition.tradeId = filters.tradeId;
+      }
+    }
+
+    const tradeMistakes = await prisma.tradeMistake.findMany({
+      where: whereCondition,
+      include: {
+        trade: {
+          include: {
+            wallet: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    // Calculate mistake frequency by category
+    const mistakesByCategory = tradeMistakes.reduce((acc, mistake) => {
+      // Determine category from mistake type or custom label
+      const category = this.determineMistakeCategory(mistake.mistakeType);
+      acc[category] = (acc[category] || 0) + 1;
+      return acc;
+    }, {} as Record<MistakeCategoryEnum, number>);
+
+    // Calculate mistake frequency by severity
+    const mistakesBySeverity = tradeMistakes.reduce((acc, mistake) => {
+      acc[mistake.severity] = (acc[mistake.severity] || 0) + 1;
+      return acc;
+    }, {} as Record<MistakeSeverity, number>);
+
+    // Find most common mistakes
+    const mistakeTypeCount = new Map<string, { count: number; totalImpact: number; severities: MistakeSeverity[] }>();
+    
+    for (const mistake of tradeMistakes) {
+      const type = mistake.mistakeType;
+      const tradePnL = this.calculateTradePnL(mistake.trade);
+      const impact = tradePnL < 0 ? Math.abs(tradePnL) : 0;
+
+      if (!mistakeTypeCount.has(type)) {
+        mistakeTypeCount.set(type, { count: 0, totalImpact: 0, severities: [] });
+      }
+
+      const data = mistakeTypeCount.get(type)!;
+      data.count += 1;
+      data.totalImpact += impact;
+      data.severities.push(mistake.severity);
+    }
+
+    const mostCommonMistakes = Array.from(mistakeTypeCount.entries())
+      .map(([type, data]) => {
+        const avgSeverity = this.calculateAverageSeverity(data.severities);
+        const label = this.getMistakeLabel(type);
+        
+        return {
+          type,
+          label,
+          count: data.count,
+          avgSeverity,
+          totalImpact: data.totalImpact
+        };
+      })
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    // Calculate mistake impact
+    const totalLoss = tradeMistakes.reduce((sum, mistake) => {
+      const tradePnL = this.calculateTradePnL(mistake.trade);
+      return sum + (tradePnL < 0 ? Math.abs(tradePnL) : 0);
+    }, 0);
+
+    const avgLossPerMistake = tradeMistakes.length > 0 ? totalLoss / tradeMistakes.length : 0;
+    const worstMistakeType = mostCommonMistakes.length > 0 ? mostCommonMistakes[0].type : '';
+
+    // Calculate improvement trend over last 6 periods
+    const improvementTrend = await this.getMistakeImprovementTrend(userId, 6);
+
+    // Calculate emotional patterns
+    const emotionalPatterns = tradeMistakes.reduce((acc, mistake) => {
+      if (mistake.emotionalState) {
+        acc[mistake.emotionalState] = (acc[mistake.emotionalState] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<EmotionalState, number>);
+
+    // Get total trades count for frequency calculation
+    const totalTrades = await prisma.trade.count({
+      where: {
+        wallet: {
+          userId: userId
+        }
+      }
+    });
+
+    const mistakeFrequency = totalTrades > 0 ? (tradeMistakes.length / totalTrades) * 100 : 0;
+
+    return {
+      totalMistakes: tradeMistakes.length,
+      mistakesByCategory,
+      mistakesBySeverity,
+      mostCommonMistakes,
+      mistakeFrequency,
+      mistakeImpact: {
+        totalLoss,
+        avgLossPerMistake,
+        worstMistakeType
+      },
+      improvementTrend,
+      emotionalPatterns
+    };
+  }
+
+  /**
+   * Get most common mistakes for a user
+   */
+  async getMostCommonMistakes(userId: string, limit: number = 10): Promise<Array<{ type: string; label: string; count: number; impact: number }>> {
+    const analytics = await this.getMistakeAnalytics(userId);
+    return analytics.mostCommonMistakes.slice(0, limit).map(mistake => ({
+      type: mistake.type,
+      label: mistake.label,
+      count: mistake.count,
+      impact: mistake.totalImpact
+    }));
+  }
+
+  /**
+   * Get mistake trends by timeframe
+   */
+  async getMistakesByTimeframe(userId: string, timeframe: 'daily' | 'weekly' | 'monthly' = 'weekly', periods: number = 12): Promise<MistakeTrend[]> {
+    const trends: MistakeTrend[] = [];
+    const now = new Date();
+
+    for (let i = periods - 1; i >= 0; i--) {
+      let startDate: Date;
+      let endDate: Date;
+      let period: string;
+
+      if (timeframe === 'daily') {
+        startDate = startOfDay(subDays(now, i));
+        endDate = endOfDay(subDays(now, i));
+        period = format(startDate, 'MMM dd');
+      } else if (timeframe === 'weekly') {
+        startDate = startOfWeek(subWeeks(now, i));
+        endDate = endOfWeek(subWeeks(now, i));
+        period = format(startDate, 'MMM dd');
+      } else {
+        startDate = startOfMonth(subMonths(now, i));
+        endDate = endOfMonth(subMonths(now, i));
+        period = format(startDate, 'MMM yyyy');
+      }
+
+      // Get mistakes for this period
+      const mistakes = await prisma.tradeMistake.count({
+        where: {
+          trade: {
+            wallet: {
+              userId: userId
+            }
+          },
+          createdAt: {
+            gte: startDate,
+            lte: endDate
+          }
+        }
+      });
+
+      // Get total trades for this period
+      const totalTrades = await prisma.trade.count({
+        where: {
+          wallet: {
+            userId: userId
+          },
+          blockTime: {
+            gte: startDate,
+            lte: endDate
+          }
+        }
+      });
+
+      // Calculate impact for this period
+      const mistakeTrades = await prisma.tradeMistake.findMany({
+        where: {
+          trade: {
+            wallet: {
+              userId: userId
+            }
+          },
+          createdAt: {
+            gte: startDate,
+            lte: endDate
+          }
+        },
+        include: {
+          trade: true
+        }
+      });
+
+      const totalImpact = mistakeTrades.reduce((sum, mistake) => {
+        const tradePnL = this.calculateTradePnL(mistake.trade);
+        return sum + (tradePnL < 0 ? Math.abs(tradePnL) : 0);
+      }, 0);
+
+      // Calculate average severity
+      const avgSeverity = mistakeTrades.length > 0
+        ? mistakeTrades.reduce((sum, mistake) => {
+            const severityValue = mistake.severity === 'LOW' ? 1 : mistake.severity === 'MEDIUM' ? 2 : 3;
+            return sum + severityValue;
+          }, 0) / mistakeTrades.length
+        : 0;
+
+      trends.push({
+        period,
+        mistakeCount: mistakes,
+        totalTrades,
+        mistakeRate: totalTrades > 0 ? (mistakes / totalTrades) * 100 : 0,
+        totalImpact,
+        avgSeverity
+      });
+    }
+
+    return trends;
+  }
+
+  /**
+   * Get P&L impact analysis by mistake type
+   */
+  async getMistakeImpact(userId: string, mistakeType: string): Promise<{ impact: number; tradeCount: number; avgImpact: number }> {
+    const mistakes = await prisma.tradeMistake.findMany({
+      where: {
+        trade: {
+          wallet: {
+            userId: userId
+          }
+        },
+        mistakeType: mistakeType
+      },
+      include: {
+        trade: true
+      }
+    });
+
+    const totalImpact = mistakes.reduce((sum, mistake) => {
+      const tradePnL = this.calculateTradePnL(mistake.trade);
+      return sum + (tradePnL < 0 ? Math.abs(tradePnL) : 0);
+    }, 0);
+
+    const avgImpact = mistakes.length > 0 ? totalImpact / mistakes.length : 0;
+
+    return {
+      impact: totalImpact,
+      tradeCount: mistakes.length,
+      avgImpact
+    };
+  }
+
+  /**
+   * Get user's custom mistake categories
+   */
+  async getUserMistakeCategories(userId: string): Promise<Array<{ id: string; name: string; category: string; usageCount: number }>> {
+    return prisma.customMistake.findMany({
+      where: {
+        userId: userId,
+        isActive: true
+      },
+      orderBy: {
+        usageCount: 'desc'
+      }
+    });
   }
 
   /**
@@ -378,6 +684,50 @@ export class AnalyticsService {
     });
   }
 
+  private async getMistakeCount(tradeIds: string[]): Promise<number> {
+    if (tradeIds.length === 0) return 0;
+
+    return prisma.tradeMistake.count({
+      where: {
+        tradeId: {
+          in: tradeIds
+        }
+      }
+    });
+  }
+
+  private async getMistakeImprovementTrend(userId: string, periods: number): Promise<MistakeTrend[]> {
+    return this.getMistakesByTimeframe(userId, 'weekly', periods);
+  }
+
+  private determineMistakeCategory(mistakeType: string): MistakeCategoryEnum {
+    // Map predefined mistake types to categories
+    if (mistakeType.startsWith('emo_')) return MistakeCategoryEnum.EMOTIONAL;
+    if (mistakeType.startsWith('risk_')) return MistakeCategoryEnum.RISK_MANAGEMENT;
+    if (mistakeType.startsWith('strat_')) return MistakeCategoryEnum.STRATEGY;
+    if (mistakeType.startsWith('time_')) return MistakeCategoryEnum.TIMING;
+    if (mistakeType.startsWith('tech_')) return MistakeCategoryEnum.TECHNICAL;
+    
+    return MistakeCategoryEnum.CUSTOM;
+  }
+
+  private getMistakeLabel(mistakeType: string): string {
+    // This would typically look up from PREDEFINED_MISTAKES
+    // For now, return a formatted version of the type
+    return mistakeType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  }
+
+  private calculateAverageSeverity(severities: MistakeSeverity[]): MistakeSeverity {
+    if (severities.length === 0) return 'MEDIUM';
+    
+    const severityValues = severities.map(s => s === 'LOW' ? 1 : s === 'MEDIUM' ? 2 : 3);
+    const avg = severityValues.reduce((sum, val) => sum + val, 0) / severityValues.length;
+    
+    if (avg <= 1.5) return 'LOW';
+    if (avg <= 2.5) return 'MEDIUM';
+    return 'HIGH';
+  }
+
   private calculateTradePnL(trade: any): number {
     if (!trade.priceIn || !trade.priceOut) return 0;
     
@@ -499,7 +849,9 @@ export class AnalyticsService {
       biggestWin: 0,
       biggestLoss: 0,
       profitFactor: 0,
-      avgHoldTime: 0
+      avgHoldTime: 0,
+      mistakeCount: 0,
+      mistakeRate: 0
     };
   }
 }

@@ -5,7 +5,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+// import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ManualTradeForm } from '@/components/trades/manual-trade-form';
 import { ArrowLeft, Plus, Copy, Sparkles } from 'lucide-react';
@@ -105,22 +105,26 @@ function AddTradePageContent() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      {/* Breadcrumb Navigation */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard/trades">Trades</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Add Trade</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      {/* Navigation */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push('/dashboard')}
+        >
+          Dashboard
+        </Button>
+        <span>/</span>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push('/dashboard/trades')}
+        >
+          Trades
+        </Button>
+        <span>/</span>
+        <span className="text-foreground font-medium">Add Trade</span>
+      </div>
 
       {/* Page Header */}
       <div className="flex items-center justify-between">

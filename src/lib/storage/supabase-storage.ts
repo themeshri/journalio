@@ -1,10 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-
-// Initialize Supabase client for storage operations
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Mock storage implementation for demo purposes
+// In production, this would use Supabase or another cloud storage service
 
 export interface FileUploadOptions {
   userId: string;
@@ -13,13 +8,30 @@ export interface FileUploadOptions {
   onProgress?: (progress: number) => void;
 }
 
+// Utility function to format file sizes
+export function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 Bytes';
+  
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
 export interface FileUploadResult {
   success: boolean;
   url?: string;
   filePath?: string;
   error?: string;
-  fileSize?: number;
-  mimeType?: string;
+}
+
+export interface VoiceNoteUploadOptions {
+  userId: string;
+  entryId: string;
+  audioBlob: Blob;
+  duration: number;
+  onProgress?: (progress: number) => void;
 }
 
 // File type validation
@@ -50,6 +62,7 @@ function validateFile(file: File): { valid: boolean; error?: string } {
   return { valid: true };
 }
 
+// Mock file upload function
 export async function uploadFile(options: FileUploadOptions): Promise<FileUploadResult> {
   const { userId, entryId, file, onProgress } = options;
   
@@ -63,163 +76,90 @@ export async function uploadFile(options: FileUploadOptions): Promise<FileUpload
       };
     }
 
-    // Generate unique file path
+    // Simulate upload progress
+    if (onProgress) {
+      const steps = [0, 25, 50, 75, 100];
+      for (const progress of steps) {
+        await new Promise(resolve => setTimeout(resolve, 200));
+        onProgress(progress);
+      }
+    }
+
+    // Generate mock file path and URL
     const timestamp = Date.now();
-    const fileExtension = file.name.split('.').pop() || '';
     const fileName = `${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
     const filePath = `journal-files/${userId}/${entryId}/${fileName}`;
-
-    // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
-      .from('journal-files')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      });
-
-    if (error) {
-      console.error('Supabase upload error:', error);
-      return {
-        success: false,
-        error: `Upload failed: ${error.message}`
-      };
-    }
-
-    // Get public URL
-    const { data: urlData } = supabase.storage
-      .from('journal-files')
-      .getPublicUrl(filePath);
-
-    // Simulate progress callback (Supabase doesn't provide real-time progress)
-    if (onProgress) {
-      onProgress(100);
-    }
+    const mockUrl = `https://demo-storage.chainjournal.app/${filePath}`;
 
     return {
       success: true,
-      url: urlData.publicUrl,
-      filePath: filePath,
-      fileSize: file.size,
-      mimeType: file.type
+      url: mockUrl,
+      filePath: filePath
     };
 
   } catch (error) {
-    console.error('Upload error:', error);
+    console.error('Mock file upload error:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown upload error'
+      error: 'Upload failed (demo mode)'
     };
   }
 }
 
-export async function downloadFile(filePath: string): Promise<{ success: boolean; blob?: Blob; error?: string }> {
+// Mock voice note upload function
+export async function uploadVoiceNote(options: VoiceNoteUploadOptions): Promise<FileUploadResult> {
+  const { userId, entryId, audioBlob, duration, onProgress } = options;
+  
   try {
-    const { data, error } = await supabase.storage
-      .from('journal-files')
-      .download(filePath);
-
-    if (error) {
-      console.error('Download error:', error);
-      return {
-        success: false,
-        error: `Download failed: ${error.message}`
-      };
+    // Simulate upload progress
+    if (onProgress) {
+      const steps = [0, 30, 60, 90, 100];
+      for (const progress of steps) {
+        await new Promise(resolve => setTimeout(resolve, 150));
+        onProgress(progress);
+      }
     }
+
+    // Generate mock file path and URL
+    const timestamp = Date.now();
+    const fileName = `voice-note-${timestamp}.webm`;
+    const filePath = `voice-notes/${userId}/${entryId}/${fileName}`;
+    const mockUrl = `https://demo-storage.chainjournal.app/${filePath}`;
 
     return {
       success: true,
-      blob: data
+      url: mockUrl,
+      filePath: filePath
     };
 
   } catch (error) {
-    console.error('Download error:', error);
+    console.error('Mock voice note upload error:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown download error'
+      error: 'Voice note upload failed (demo mode)'
     };
   }
 }
 
+// Mock file deletion function
 export async function deleteFile(filePath: string): Promise<{ success: boolean; error?: string }> {
   try {
-    const { error } = await supabase.storage
-      .from('journal-files')
-      .remove([filePath]);
-
-    if (error) {
-      console.error('Delete error:', error);
-      return {
-        success: false,
-        error: `Delete failed: ${error.message}`
-      };
-    }
-
+    // Simulate deletion delay
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    console.log('Mock file deleted:', filePath);
+    
     return { success: true };
-
   } catch (error) {
-    console.error('Delete error:', error);
+    console.error('Mock file deletion error:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown delete error'
+      error: 'File deletion failed (demo mode)'
     };
   }
 }
 
-export async function generateSignedUrl(filePath: string, expiresIn: number = 3600): Promise<{ success: boolean; signedUrl?: string; error?: string }> {
-  try {
-    const { data, error } = await supabase.storage
-      .from('journal-files')
-      .createSignedUrl(filePath, expiresIn);
-
-    if (error) {
-      console.error('Signed URL error:', error);
-      return {
-        success: false,
-        error: `Signed URL generation failed: ${error.message}`
-      };
-    }
-
-    return {
-      success: true,
-      signedUrl: data.signedUrl
-    };
-
-  } catch (error) {
-    console.error('Signed URL error:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown signed URL error'
-    };
-  }
+// Mock function to get file URL
+export function getFileUrl(filePath: string): string {
+  return `https://demo-storage.chainjournal.app/${filePath}`;
 }
-
-export function getFileTypeFromMime(mimeType: string): 'image' | 'audio' | 'document' {
-  if (ALLOWED_IMAGE_TYPES.includes(mimeType)) {
-    return 'image';
-  }
-  if (ALLOWED_AUDIO_TYPES.includes(mimeType)) {
-    return 'audio';
-  }
-  return 'document';
-}
-
-// Utility function to format file size
-export function formatFileSize(bytes: number): string {
-  if (bytes === 0) return '0 Bytes';
-  
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-// Check if Supabase is properly configured
-export function isSupabaseConfigured(): boolean {
-  return !!(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
-}
-
-export { supabase };

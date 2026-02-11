@@ -33,6 +33,7 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { TradeEditInput, TradeSource } from '@/types/trade';
 import { toast } from 'sonner';
+import { TradeJournal } from '@/components/journaling/trade-journal';
 
 // Trade edit validation schema
 const tradeEditSchema = z.object({
@@ -772,6 +773,25 @@ export function TradeEditor({ tradeId, onSuccess, onCancel }: TradeEditorProps) 
             </div>
           </form>
         </Form>
+
+        {/* Trade Journaling Section */}
+        <div className="mt-8 pt-6 border-t">
+          <div className="mb-4">
+            <h3 className="text-xl font-semibold flex items-center gap-2">
+              <Star className="h-5 w-5" />
+              Trade Journal
+            </h3>
+            <p className="text-muted-foreground text-sm">
+              Add your thoughts, analysis, and lessons learned from this trade
+            </p>
+          </div>
+          
+          <TradeJournal
+            tradeId={tradeId}
+            type="trade"
+            className="mt-4"
+          />
+        </div>
 
         {/* Confirmation Dialog */}
         <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>

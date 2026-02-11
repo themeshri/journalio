@@ -1,51 +1,51 @@
-import { getUserDetails } from '@/lib/auth';
-import { Card } from '@/components/ui/card';
+import { requireAuth } from '@/lib/auth';
+import { prisma } from '@/lib/db';
+import { WalletList } from '@/components/wallet/wallet-list';
+import { CombinedDashboard } from '@/components/dashboard/combined-dashboard';
+import { Button } from "@/components/ui/button";
+import Link from 'next/link';
 
-export default async function DashboardPage() {
-  const user = await getUserDetails();
+export default async function Dashboard() {
+  const userId = await requireAuth();
+  
+  const wallets = await prisma.wallet.findMany({
+    where: { userId, isActive: true },
+    include: {
+      _count: {
+        select: { trades: true }
+      }
+    },
+    orderBy: { createdAt: 'desc' }
+  });
+
+  if (wallets.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold mb-4">Welcome to ChainJournal</h2>
+        <p className="text-muted-foreground mb-6">
+          Get started by adding your first wallet address
+        </p>
+        <Link href="/dashboard/wallets/add">
+          <Button>Add Wallet</Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome back, {user.name || user.email}
-        </p>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Trading Dashboard</h1>
+        <Link href="/dashboard/wallets/add">
+          <Button>Add Wallet</Button>
+        </Link>
       </div>
+
+      <WalletList wallets={wallets} />
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-2">Total Trades</h3>
-          <p className="text-3xl font-bold text-primary">0</p>
-          <p className="text-sm text-muted-foreground">No trades recorded yet</p>
-        </Card>
-        
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-2">Portfolio Value</h3>
-          <p className="text-3xl font-bold text-green-600">$0.00</p>
-          <p className="text-sm text-muted-foreground">Connect wallet to view</p>
-        </Card>
-        
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-2">P&L Today</h3>
-          <p className="text-3xl font-bold text-gray-600">$0.00</p>
-          <p className="text-sm text-muted-foreground">No trades today</p>
-        </Card>
-      </div>
-      
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-        <div className="grid gap-3 md:grid-cols-2">
-          <div className="p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-            <h4 className="font-medium">Connect Wallet</h4>
-            <p className="text-sm text-muted-foreground">Link your crypto wallet to import trades automatically</p>
-          </div>
-          <div className="p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-            <h4 className="font-medium">Import from OKX</h4>
-            <p className="text-sm text-muted-foreground">Connect your OKX account to sync trading history</p>
-          </div>
-        </div>
-      </Card>
+      {wallets.length > 1 && (
+        <CombinedDashboard wallets={wallets} />
+      )}
     </div>
   );
 }

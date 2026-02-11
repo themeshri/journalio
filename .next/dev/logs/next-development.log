@@ -1,4 +1,36 @@
-[00:00:01.284] Server  WARN    ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-[00:00:01.397] Server  LOG     ✓ Ready in 1079ms
-[00:03:36.364] Server  LOG       Reload env: .env.local
-[00:19:36.622] Server  LOG       Reload env: .env.local
+[00:00:00.928] Server  WARN    ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+[00:00:01.037] Server  LOG     ✓ Ready in 683ms
+[00:00:05.234] Server  LOG     ○ Compiling /dashboard/trades ...
+[00:00:08.591] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:09.292] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:11.533] Server  LOG     Fetching trade with ID: "4"
+[00:00:11.536] Server  LOG     Found trade: "WIF" "→" "USDC"
+[00:00:11.581] Server  LOG     Fetching trade with ID: "4"
+[00:00:11.582] Server  LOG     Found trade: "WIF" "→" "USDC"
+[00:00:11.593] Server  LOG     Fetching trade with ID: "4"
+[00:00:11.593] Server  LOG     Found trade: "WIF" "→" "USDC"
+[00:00:11.700] Browser ERROR   Application error: {}
+[00:00:11.700] Browser ERROR   Application error: {}
+[00:01:53.972] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:54.320] Server  LOG     Fetching trade with ID: "4"
+[00:01:54.321] Server  LOG     Found trade: "WIF" "→" "USDC"
+[00:01:54.371] Server  LOG     Fetching trade with ID: "4"
+[00:01:54.372] Server  LOG     Found trade: "WIF" "→" "USDC"
+[00:01:54.423] Server  LOG     Fetching trade with ID: "4"
+[00:01:54.423] Server  LOG     Found trade: "WIF" "→" "USDC"
+[00:01:54.506] Browser ERROR   Application error: {}
+[00:01:54.506] Browser ERROR   Application error: {}
+[00:13:06.187] Server  LOG     ✓ Compiled in 198ms
+[00:13:17.311] Server  LOG     ✓ Compiled in 141ms
+[00:14:02.130] Server  LOG     ✓ Compiled in 142ms
+[00:15:16.748] Server  LOG     ✓ Compiled in 378ms
+[00:15:21.187] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:15:21.408] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:15:22.860] Server  LOG     Fetching trade with ID: "4"
+[00:15:22.862] Server  LOG     Found trade: "WIF" "→" "USDC"
+[00:15:23.051] Server  LOG     Fetching trade with ID: "4"
+[00:15:23.051] Server  LOG     Found trade: "WIF" "→" "USDC"
+[00:15:23.138] Server  LOG     Fetching trade with ID: "4"
+[00:15:23.138] Server  LOG     Found trade: "WIF" "→" "USDC"
+[00:15:24.361] Browser ERROR   Application error: {}
+[00:15:24.361] Browser ERROR   Application error: {}

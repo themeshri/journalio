@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 14, "column": 0}, "map": {"version":3,"sources":["file:///Users/husammeshri/Desktop/journalio/journalio-new/src/app/page.tsx"],"sourcesContent":["export default function Home() {\n  return (\n    <main className=\"flex min-h-screen flex-col items-center justify-center p-24\">\n      <div className=\"text-center space-y-6\">\n        <h1 className=\"text-4xl font-bold\">ChainJournal</h1>\n        <p className=\"text-xl text-muted-foreground\">\n          Professional crypto trading journal and analytics\n        </p>\n        <div className=\"space-y-4\">\n          <p className=\"text-blue-600\">✓ Next.js 16 initialized</p>\n          <p className=\"text-gray-500\">Authentication setup in progress...</p>\n        </div>\n      </div>\n    </main>\n  )\n}"],"names":[],"mappings":";;;;;;AAAe,SAAS;IACtB,qBACE,8OAAC;QAAK,WAAU;kBACd,cAAA,8OAAC;YAAI,WAAU;;8BACb,8OAAC;oBAAG,WAAU;8BAAqB;;;;;;8BACnC,8OAAC;oBAAE,WAAU;8BAAgC;;;;;;8BAG7C,8OAAC;oBAAI,WAAU;;sCACb,8OAAC;4BAAE,WAAU;sCAAgB;;;;;;sCAC7B,8OAAC;4BAAE,WAAU;sCAAgB;;;;;;;;;;;;;;;;;;;;;;;AAKvC"}}]
-}

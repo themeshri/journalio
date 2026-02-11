@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 14, "column": 0}, "map": {"version":3,"sources":["file:///Users/husammeshri/Desktop/journalio/journalio-new/src/app/sign-in/%5B%5B...sign-in%5D%5D/page.tsx"],"sourcesContent":["import { SignIn } from '@clerk/nextjs'\n\nexport default function SignInPage() {\n  return (\n    <div className=\"flex items-center justify-center min-h-screen bg-gray-50\">\n      <div className=\"w-full max-w-md\">\n        <div className=\"text-center mb-8\">\n          <h1 className=\"text-2xl font-bold text-gray-900\">Welcome back</h1>\n          <p className=\"text-gray-600 mt-2\">Sign in to your ChainJournal account</p>\n        </div>\n        <SignIn \n          appearance={{\n            elements: {\n              rootBox: \"mx-auto\",\n              card: \"shadow-lg border border-gray-200\",\n              headerTitle: \"hidden\",\n              headerSubtitle: \"hidden\",\n            }\n          }}\n        />\n      </div>\n    </div>\n  )\n}"],"names":[],"mappings":";;;;;AAAA;;;AAEe,SAAS;IACtB,qBACE,8OAAC;QAAI,WAAU;kBACb,cAAA,8OAAC;YAAI,WAAU;;8BACb,8OAAC;oBAAI,WAAU;;sCACb,8OAAC;4BAAG,WAAU;sCAAmC;;;;;;sCACjD,8OAAC;4BAAE,WAAU;sCAAqB;;;;;;;;;;;;8BAEpC,8OAAC,gMAAM;oBACL,YAAY;wBACV,UAAU;4BACR,SAAS;4BACT,MAAM;4BACN,aAAa;4BACb,gBAAgB;wBAClB;oBACF;;;;;;;;;;;;;;;;;AAKV"}}]
-}

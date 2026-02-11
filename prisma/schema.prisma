@@ -83,6 +83,7 @@ model Trade {
   wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
   positionTrades PositionTrade[]
   auditLogs TradeAuditLog[]
+  mistakes TradeMistake[]
   
   @@index([walletId, blockTime])
   @@index([walletId, source])
@@ -225,4 +226,86 @@ model JournalTag {
   @@unique([userId, name])
   @@index([userId, usageCount])
   @@map("journal_tags")
+}
+
+enum MistakeCategoryEnum {
+  EMOTIONAL
+  RISK_MANAGEMENT
+  STRATEGY
+  TIMING
+  TECHNICAL
+  CUSTOM
+}
+
+enum MistakeSeverity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum EmotionalState {
+  CONFIDENT
+  FEARFUL
+  GREEDY
+  NEUTRAL
+  ANXIOUS
+  EUPHORIC
+}
+
+model TradeMistake {
+  id                String          @id @default(cuid())
+  tradeId           String
+  mistakeType       String          // predefined mistake ID or custom label
+  customLabel       String?         // For custom mistakes
+  severity          MistakeSeverity
+  emotionalState    EmotionalState?
+  notes             String?         @db.Text
+  learningPoints    String?         @db.Text
+  preventionStrategy String?        @db.Text
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  
+  trade Trade @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+  
+  @@index([tradeId])
+  @@index([mistakeType])
+  @@index([severity])
+  @@index([createdAt])
+  @@map("trade_mistakes")
+}
+
+model MistakeCategory {
+  id          String              @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  category    MistakeCategoryEnum
+  isActive    Boolean             @default(true)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  
+  customMistakes CustomMistake[]
+  
+  @@unique([userId, name])
+  @@index([userId, category])
+  @@map("mistake_categories")
+}
+
+model CustomMistake {
+  id          String              @id @default(cuid())
+  userId      String
+  categoryId  String
+  label       String
+  description String?
+  usageCount  Int                 @default(0)
+  isActive    Boolean             @default(true)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  
+  category MistakeCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, categoryId, label])
+  @@index([userId, categoryId])
+  @@index([usageCount])
+  @@map("custom_mistakes")
 }

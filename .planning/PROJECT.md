@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A comprehensive trading journal for on-chain DEX trading that automatically imports trades from Solana wallet addresses via OKX API (expanding to Base and BSC), enriches them with advanced journaling capabilities including voice notes, mistake tracking, daily journaling, and strategy management. Built as a SaaS with social login and subscription-based monetization.
+A comprehensive trading journal for on-chain DEX trading that automatically imports trades from Solana wallet addresses via OKX API (expanding to Base and BSC), enriches them with advanced journaling capabilities including voice notes, mistake tracking, daily journaling, and strategy management. Built as a SaaS with social login and subscription-based monetization..
 
 ## Core Value
 

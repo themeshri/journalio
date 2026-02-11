@@ -25,8 +25,17 @@ export class SolanaTransactionParser {
       const trades: ParsedTrade[] = [];
 
       for (const sigInfo of signatures) {
-        // Skip failed transactions
+        // Handle failed transactions separately
         if (sigInfo.err) {
+          try {
+            const transaction = await this.solanaClient.getTransaction(sigInfo.signature);
+            if (transaction) {
+              const failedTrade = await this.parseFailedTransaction(sigInfo.signature, transaction);
+              trades.push(failedTrade);
+            }
+          } catch (error) {
+            console.error(`Error parsing failed transaction ${sigInfo.signature}:`, error);
+          }
           continue;
         }
 
@@ -137,12 +146,12 @@ export class SolanaTransactionParser {
         const postAmount = BigInt(post.uiTokenAmount.amount);
         const difference = postAmount - preAmount;
 
-        if (difference !== 0n) {
+        if (difference !== BigInt(0)) {
           transfers.push({
             mint: pre.mint,
             amount: Math.abs(Number(difference)).toString(),
             decimals: pre.uiTokenAmount.decimals,
-            direction: difference > 0n ? 'in' : 'out'
+            direction: difference > BigInt(0) ? 'in' : 'out'
           });
         }
       }

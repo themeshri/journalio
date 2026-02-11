@@ -46,9 +46,11 @@ export function AuthError({ error, reset, message }: AuthErrorProps) {
               Try Again
             </Button>
           )}
-          <Button variant="outline" asChild className="w-full">
-            <a href="/sign-in">Go to Sign In</a>
-          </Button>
+          <a href="/sign-in" className="w-full">
+            <Button variant="outline" className="w-full">
+              Go to Sign In
+            </Button>
+          </a>
         </div>
       </div>
     </div>

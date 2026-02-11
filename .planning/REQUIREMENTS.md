@@ -16,20 +16,21 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **AUTH-06**: User data syncs across multiple devices
 
 ### Wallet Management
-- [ ] **WALL-01**: User can connect Solana wallet (read-only)
-- [ ] **WALL-02**: User can add multiple wallets to same account
+- [ ] **WALL-01**: User can add Solana wallet address (paste address, read-only)
+- [ ] **WALL-02**: User can add multiple wallet addresses to same account
 - [ ] **WALL-03**: User can view separate dashboard per wallet
 - [ ] **WALL-04**: User can view combined dashboard across all wallets
-- [ ] **WALL-05**: User can remove wallet from account
+- [ ] **WALL-05**: User can remove wallet address from account
 
 ### Trade Import
-- [ ] **TRAD-01**: System automatically imports historical trades from connected wallets
-- [ ] **TRAD-02**: System fetches new trades periodically (daily sync)
-- [ ] **TRAD-03**: System correctly parses DEX swaps and calculates P&L
-- [ ] **TRAD-04**: System handles failed/reverted transactions properly
-- [ ] **TRAD-05**: User can manually add missing trades
-- [ ] **TRAD-06**: User can edit trade details (price, quantity, notes)
-- [ ] **TRAD-07**: User can delete incorrect trades
+- [ ] **TRAD-01**: System automatically imports historical trades from wallet addresses via OKX API
+- [ ] **TRAD-02**: System fetches new trades periodically (daily auto-sync)
+- [ ] **TRAD-03**: User can manually trigger trade fetch/sync at any time
+- [ ] **TRAD-04**: System correctly parses DEX swaps and calculates P&L
+- [ ] **TRAD-05**: System handles failed/reverted transactions properly
+- [ ] **TRAD-06**: User can manually add missing trades
+- [ ] **TRAD-07**: User can edit trade details (price, quantity, notes)
+- [ ] **TRAD-08**: User can delete incorrect trades
 
 ### Basic Analytics
 - [ ] **ANAL-01**: User can view total P&L across all trades
@@ -38,12 +39,44 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **ANAL-04**: User can filter trades by token, date range, profit/loss
 - [ ] **ANAL-05**: User can view list of all trades with basic details
 
-### Journaling
-- [ ] **JOUR-01**: User can add text notes to any trade
-- [ ] **JOUR-02**: User can upload screenshots for trades
-- [ ] **JOUR-03**: User can add tags to categorize trades
-- [ ] **JOUR-04**: User can search through notes and tags
-- [ ] **JOUR-05**: User can rate trades (1-5 stars)
+### Trade Grouping & Journaling
+- [ ] **TGRP-01**: System groups related buy/sell trades for same token (entry/exit positions)
+- [ ] **TGRP-02**: User can view grouped trades as single position with combined journaling
+- [ ] **TGRP-03**: User can manually adjust trade groupings when needed
+
+### Position Journaling
+- [ ] **JOUR-01**: User can add text notes to entry trades (buy positions)
+- [ ] **JOUR-02**: User can add text notes to exit trades (sell positions)
+- [ ] **JOUR-03**: User can record voice notes for entry and exit trades
+- [ ] **JOUR-04**: User can upload screenshots for trades
+- [ ] **JOUR-05**: User can add tags to categorize trades
+- [ ] **JOUR-06**: User can search through notes and tags
+- [ ] **JOUR-07**: User can rate trades (1-5 stars)
+
+### Mistake Tracking
+- [ ] **MIST-01**: User can select from predefined entry mistakes list
+- [ ] **MIST-02**: User can select from predefined exit mistakes list
+- [ ] **MIST-03**: User can add custom mistakes to their personal list
+- [ ] **MIST-04**: System tracks frequency of mistake types
+
+### Missed Trades Journal
+- [ ] **MISS-01**: User can manually add trades they didn't execute
+- [ ] **MISS-02**: User can journal why they missed the trade opportunity
+- [ ] **MISS-03**: User can categorize missed trade types
+- [ ] **MISS-04**: User can view missed trades analytics
+
+### Daily Journal
+- [ ] **DAYJ-01**: User can add daily emotional state and expectations
+- [ ] **DAYJ-02**: User can journal market outlook and strategies for the day
+- [ ] **DAYJ-03**: System displays daily market metrics (SOL/BTC/ETH/SPX open/close)
+- [ ] **DAYJ-04**: System displays onchain volume and Fear & Greed index
+- [ ] **DAYJ-05**: User can view historical daily journal entries with metrics
+
+### Strategy Management
+- [ ] **STRA-01**: User can create detailed trading strategies
+- [ ] **STRA-02**: User can manage multiple strategies
+- [ ] **STRA-03**: User can link trades to specific strategies
+- [ ] **STRA-04**: User can view strategy performance analytics
 
 ### Subscription Management
 - [ ] **SUBS-01**: New users get 7-day free trial with full features
@@ -114,19 +147,44 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TRAD-02 | Phase 1 | Pending |
 | TRAD-03 | Phase 1 | Pending |
 | TRAD-04 | Phase 1 | Pending |
-| TRAD-05 | Phase 2 | Pending |
+| TRAD-03 | Phase 1 | Pending |
+| TRAD-04 | Phase 1 | Pending |
+| TRAD-05 | Phase 1 | Pending |
 | TRAD-06 | Phase 2 | Pending |
 | TRAD-07 | Phase 2 | Pending |
+| TRAD-08 | Phase 2 | Pending |
 | ANAL-01 | Phase 2 | Pending |
 | ANAL-02 | Phase 2 | Pending |
 | ANAL-03 | Phase 2 | Pending |
 | ANAL-04 | Phase 2 | Pending |
 | ANAL-05 | Phase 2 | Pending |
+| TGRP-01 | Phase 2 | Pending |
+| TGRP-02 | Phase 2 | Pending |
+| TGRP-03 | Phase 2 | Pending |
 | JOUR-01 | Phase 2 | Pending |
 | JOUR-02 | Phase 2 | Pending |
 | JOUR-03 | Phase 2 | Pending |
 | JOUR-04 | Phase 2 | Pending |
 | JOUR-05 | Phase 2 | Pending |
+| JOUR-06 | Phase 2 | Pending |
+| JOUR-07 | Phase 2 | Pending |
+| MIST-01 | Phase 2 | Pending |
+| MIST-02 | Phase 2 | Pending |
+| MIST-03 | Phase 2 | Pending |
+| MIST-04 | Phase 2 | Pending |
+| MISS-01 | Phase 3 | Pending |
+| MISS-02 | Phase 3 | Pending |
+| MISS-03 | Phase 3 | Pending |
+| MISS-04 | Phase 3 | Pending |
+| DAYJ-01 | Phase 3 | Pending |
+| DAYJ-02 | Phase 3 | Pending |
+| DAYJ-03 | Phase 3 | Pending |
+| DAYJ-04 | Phase 3 | Pending |
+| DAYJ-05 | Phase 3 | Pending |
+| STRA-01 | Phase 3 | Pending |
+| STRA-02 | Phase 3 | Pending |
+| STRA-03 | Phase 3 | Pending |
+| STRA-04 | Phase 3 | Pending |
 | SUBS-01 | Phase 3 | Pending |
 | SUBS-02 | Phase 3 | Pending |
 | SUBS-03 | Phase 3 | Pending |
@@ -134,8 +192,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SUBS-05 | Phase 3 | Pending |
 
 **Coverage:**
-- v1 requirements: 30 total
-- Mapped to phases: 30
+- v1 requirements: 48 total
+- Mapped to phases: 48
 - Unmapped: 0 ✓
 
 ---

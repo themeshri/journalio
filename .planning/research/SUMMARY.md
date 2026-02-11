@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-ChainJournal is a crypto trading journal focused on DEX/on-chain trading, specifically targeting users who trade through wallets like OKX on chains including Solana, Base, and BSC. Research shows that successful crypto trading journals require robust automated trade import capabilities, accurate P&L calculations handling blockchain complexity, and a focused feature set that avoids the feature bloat common in traditional trading journals.
+ChainJournal is a crypto trading journal focused on DEX/on-chain trading, using wallet address input (no wallet connection required) to fetch trade data via OKX API from chains including Solana, Base, and BSC. The platform differentiates with advanced journaling features including voice notes, trade grouping, mistake tracking, daily market journaling, and strategy management. Research shows success requires proving automated trade import accuracy before building advanced features.
 
 The recommended approach is a Next.js 16+ full-stack application with PostgreSQL for financial data integrity, Clerk for authentication, and OKX Wallet API integration as the core differentiator. The architecture should start with a monolithic approach for rapid development, then evolve to microservices as scale demands. Critical to avoid typical pitfalls around API reliability, blockchain data parsing complexity, and building too many features before proving core value.
 
@@ -32,12 +32,15 @@ Modern SaaS development in 2025 has converged on Next.js 16+ as the full-stack f
 Users expect automatic trade import as table stakes since manual entry is impractical for DEX trading. The competitive advantage lies in specialized DEX handling and cross-chain aggregation rather than broad multi-asset support.
 
 **Must have (table stakes):**
-- Automatic Trade Import (OKX Wallet API) — essential for DEX trades, manual entry impractical
-- Multi-Wallet Support — users trade across multiple wallet addresses
+- Wallet Address Management — users paste addresses, no connection required
+- Automatic Trade Import (OKX Wallet API) — essential for DEX trades, with manual sync option
+- Trade Grouping — group buy/sell trades into positions for better analysis
+- Advanced Journaling — text notes, voice recordings, screenshots per trade
+- Mistake Tracking — predefined mistake lists with custom additions
+- Daily Journaling — daily emotional state and market metrics tracking
+- Strategy Management — create and track multiple trading strategies
 - Basic P&L Tracking — fundamental value proposition with USD and crypto calculations
-- Trade History View — users need immediate visibility of chronological trades
 - Mobile-Responsive UI — most crypto trading happens on mobile
-- CSV Export — required for tax/accounting compliance
 
 **Should have (competitive):**
 - Real-time On-Chain Analysis — live tracking of DEX positions and pending transactions
@@ -77,21 +80,21 @@ Based on research, suggested phase structure:
 
 ### Phase 1: Foundation & Core Import
 **Rationale:** Must prove accurate trade import before any other features have value
-**Delivers:** Working trade import, basic P&L, and journal functionality for Solana only
-**Addresses:** User authentication, OKX Wallet API integration, multi-wallet support, basic P&L tracking
-**Avoids:** API rate limit issues, authentication security gaps, blockchain data complexity
+**Delivers:** Wallet address management, automatic trade import, basic P&L for Solana only
+**Addresses:** User authentication, OKX Wallet API integration, manual sync triggers, multi-address support
+**Avoids:** Wallet connection complexity, API rate limit issues, authentication security gaps
 
-### Phase 2: Analytics & Performance
-**Rationale:** Once data import is proven accurate, users need analytics to derive value
-**Delivers:** Performance metrics, dashboard optimization, and enhanced mobile experience
-**Uses:** PostgreSQL with proper indexing, Redis for caching, TanStack Query for real-time updates
-**Implements:** Analytics service with time-series optimization and cached calculations
+### Phase 2: Analytics & Advanced Journaling
+**Rationale:** Once data import is proven accurate, add advanced journaling and trade analysis
+**Delivers:** Trade grouping, voice notes, mistake tracking, advanced analytics dashboard
+**Uses:** PostgreSQL with proper indexing, audio storage, enhanced journaling capabilities
+**Implements:** Position-level analysis, mistake pattern tracking, performance metrics
 
-### Phase 3: Multi-Chain Expansion
-**Rationale:** Expand market reach only after proving single-chain excellence
-**Delivers:** Base and BSC chain support with unified cross-chain portfolio view
-**Addresses:** Cross-chain portfolio view, advanced trade import capabilities
-**Avoids:** Premature optimization pitfalls by building on proven architecture
+### Phase 3: Advanced Features & Subscription
+**Rationale:** Add comprehensive features and business model after core value is proven
+**Delivers:** Daily journaling with market metrics, missed trades tracking, strategy management, subscription system
+**Addresses:** Complete journaling workflow, market context tracking, business model implementation
+**Avoids:** Feature creep by building on proven foundation
 
 ### Phase 4: Advanced Features & Growth
 **Rationale:** Add differentiating features once core functionality is validated

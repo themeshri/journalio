@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A comprehensive trading journal for on-chain DEX trading that automatically imports trades from Solana (expanding to Base and BSC), enriches them with detailed journaling capabilities, and provides professional analytics similar to TradesViz/Tradezella. Built as a SaaS with social login, multi-wallet tracking, and subscription-based monetization.
+A comprehensive trading journal for on-chain DEX trading that automatically imports trades from Solana wallet addresses via OKX API (expanding to Base and BSC), enriches them with advanced journaling capabilities including voice notes, mistake tracking, daily journaling, and strategy management. Built as a SaaS with social login and subscription-based monetization.
 
 ## Core Value
 
@@ -16,13 +16,17 @@ Accurate automatic trade import from all supported chains that gives traders the
 
 ### Active
 
-- [ ] Automatic trade import from Solana DEX activity via OKX API
-- [ ] Multi-wallet management with separate account tracking
-- [ ] Rich journaling with notes, screenshots, tags, emotional state tracking
+- [ ] Automatic trade import from Solana wallet addresses via OKX API
+- [ ] Multi-wallet address management with separate account tracking
+- [ ] Advanced journaling: voice notes, screenshots, text notes, mistake tracking
+- [ ] Trade grouping (entry/exit positions) with position-level journaling
+- [ ] Daily journaling with market metrics (SOL/BTC/ETH/SPX, volume, Fear & Greed)
+- [ ] Missed trades journaling for opportunities not taken
+- [ ] Strategy management with performance tracking
 - [ ] Professional analytics dashboard with P&L metrics
 - [ ] Social login (X/Google/email) with cross-device sync
 - [ ] 7-day free trial with subscription paywall
-- [ ] Manual trade add/edit capabilities for missing data
+- [ ] Manual trade add/edit capabilities and manual sync triggers
 
 ### Out of Scope
 
@@ -48,9 +52,11 @@ Building a TradesViz/Tradezella equivalent for crypto traders who need professio
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | Start with Solana only | Fastest path to market, most active DEX ecosystem | — Pending |
+| Wallet address input only | No wallet connection needed, reduces friction and security concerns | — Pending |
 | OKX API exclusive | Comprehensive data across chains, single integration | — Pending |
 | 7-day trial model | Balance between user evaluation and conversion | — Pending |
 | Social login only | Better UX, easier account recovery, cross-device sync | — Pending |
+| Advanced journaling focus | Differentiate from basic tools with voice, mistakes, daily logs | — Pending |
 
 ---
-*Last updated: 2026-02-10 after initialization*
+*Last updated: 2026-02-10 after feature expansion*

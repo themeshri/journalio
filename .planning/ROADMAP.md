@@ -13,21 +13,21 @@ ChainJournal's roadmap transforms the vision of accurate automatic trade import 
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Foundation & Import** - Core authentication, wallet management, and automatic trade import
-- [ ] **Phase 2: Analytics & Journaling** - Trading analytics dashboard and rich journaling features
-- [ ] **Phase 3: Subscription Management** - Free trial, paid subscriptions, and feature gating
+- [ ] **Phase 2: Analytics & Journaling** - Trading analytics, advanced journaling with voice notes, trade grouping, and mistake tracking
+- [ ] **Phase 3: Advanced Features** - Daily journaling, missed trades tracking, strategy management, and subscription system
 
 ## Phase Details
 
 ### Phase 1: Foundation & Import
-**Goal**: Users can securely connect wallets and automatically import their Solana trading history
+**Goal**: Users can securely add wallet addresses and automatically import their Solana trading history
 **Depends on**: Nothing (first phase)
-**Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06, WALL-01, WALL-02, WALL-03, WALL-04, WALL-05, TRAD-01, TRAD-02, TRAD-03, TRAD-04
+**Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06, WALL-01, WALL-02, WALL-03, WALL-04, WALL-05, TRAD-01, TRAD-02, TRAD-03, TRAD-04, TRAD-05
 **Success Criteria** (what must be TRUE):
   1. User can sign up and log in using X/Twitter, Google, or email/password
-  2. User can connect multiple Solana wallets to their account
-  3. User can view separate dashboards for each connected wallet
+  2. User can add multiple Solana wallet addresses to their account (paste addresses)
+  3. User can view separate dashboards for each wallet address
   4. System automatically imports and displays historical trades with accurate P&L
-  5. User stays logged in across browser sessions and devices sync data
+  5. User can manually trigger trade sync and stays logged in across devices
 **Plans**: TBD
 
 Plans:
@@ -36,31 +36,31 @@ Plans:
 - [ ] 01-03: TBD
 
 ### Phase 2: Analytics & Journaling
-**Goal**: Users can analyze their trading performance and add rich documentation to trades
+**Goal**: Users can analyze their trading performance with advanced journaling and trade grouping
 **Depends on**: Phase 1
-**Requirements**: TRAD-05, TRAD-06, TRAD-07, ANAL-01, ANAL-02, ANAL-03, ANAL-04, ANAL-05, JOUR-01, JOUR-02, JOUR-03, JOUR-04, JOUR-05
+**Requirements**: TRAD-06, TRAD-07, TRAD-08, ANAL-01, ANAL-02, ANAL-03, ANAL-04, ANAL-05, TGRP-01, TGRP-02, TGRP-03, JOUR-01, JOUR-02, JOUR-03, JOUR-04, JOUR-05, JOUR-06, JOUR-07, MIST-01, MIST-02, MIST-03, MIST-04
 **Success Criteria** (what must be TRUE):
-  1. User can view comprehensive P&L statistics (total, win/loss ratio, time-based breakdowns)
-  2. User can filter and search trades by token, date range, profit/loss status
-  3. User can manually add, edit, and delete trades when needed
-  4. User can add notes, screenshots, tags, and ratings to any trade
-  5. User can search through their trade documentation to find specific entries
+  1. User can view comprehensive P&L statistics and filter by multiple criteria
+  2. System groups related buy/sell trades into positions for combined analysis
+  3. User can add text notes, voice recordings, and screenshots to entry/exit trades
+  4. User can select from predefined mistakes or add custom mistakes to trades
+  5. User can manually add, edit, and delete trades when needed
 **Plans**: TBD
 
 Plans:
 - [ ] 02-01: TBD
 - [ ] 02-02: TBD
 
-### Phase 3: Subscription Management
-**Goal**: Users can access the platform through a freemium model with subscription upgrades
+### Phase 3: Advanced Features
+**Goal**: Users have comprehensive journaling tools with daily tracking, missed trades, and strategy management
 **Depends on**: Phase 2
-**Requirements**: SUBS-01, SUBS-02, SUBS-03, SUBS-04, SUBS-05
+**Requirements**: MISS-01, MISS-02, MISS-03, MISS-04, DAYJ-01, DAYJ-02, DAYJ-03, DAYJ-04, DAYJ-05, STRA-01, STRA-02, STRA-03, STRA-04, SUBS-01, SUBS-02, SUBS-03, SUBS-04, SUBS-05
 **Success Criteria** (what must be TRUE):
-  1. New users automatically receive a 7-day free trial with full feature access
-  2. After trial expiry, free users can only add notes while analytics are restricted
-  3. Users can upgrade to paid subscription to unlock all features
-  4. Users can view their subscription status and manage billing
-  5. System consistently enforces feature restrictions based on subscription tier
+  1. User can journal missed trade opportunities with reasons why they weren't taken
+  2. User can add daily emotional state, market outlook, and strategies
+  3. System displays daily market metrics (SOL/BTC/ETH/SPX, volume, Fear & Greed index)
+  4. User can create and manage multiple detailed trading strategies
+  5. Subscription system works with 7-day trial and feature restrictions
 **Plans**: TBD
 
 Plans:

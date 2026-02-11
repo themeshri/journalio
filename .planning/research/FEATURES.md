@@ -21,6 +21,11 @@ Features users assume exist. Missing these = product feels incomplete.
 | Basic Performance Metrics | Win rate, total P&L, best/worst trades | MEDIUM | Statistical calculations on trade data |
 | User Authentication | Secure access to personal trading data | MEDIUM | Social login (X/Google) + email registration |
 | Trade Notes/Tags | Ability to annotate trades with strategy/thoughts | LOW | Simple text fields and tagging system |
+| Voice Recording | Audio notes for trades and daily journaling | MEDIUM | Audio recording, storage, and playback features |
+| Trade Grouping | Group buy/sell trades into positions for analysis | MEDIUM | Position-level journaling and P&L calculation |
+| Mistake Tracking | Track and categorize trading mistakes | LOW | Predefined lists plus custom mistake categories |
+| Daily Journaling | Track emotional state and market outlook daily | MEDIUM | Daily logs with market metrics integration |
+| Strategy Management | Create and track multiple trading strategies | MEDIUM | Strategy templates and performance tracking |
 | Mobile Access | Responsive design for mobile trading | MEDIUM | Progressive web app or native mobile optimization |
 
 ### Differentiators (Competitive Advantage)
@@ -100,22 +105,27 @@ Advanced Risk Metrics ──enhances──> Basic Performance Metrics
 Minimum viable product — what's needed to validate the concept.
 
 - [ ] User Authentication (X/Google/Email) — Essential for data security and user onboarding
+- [ ] Wallet Address Management — Users paste addresses (no wallet connection needed)
 - [ ] OKX Wallet API Integration — Core differentiator for automatic Solana trade import
+- [ ] Manual Sync Trigger — Users can manually fetch new trades
 - [ ] Basic P&L Tracking — Fundamental value proposition for traders
 - [ ] Trade History View — Users need to see their trades immediately
-- [ ] Multi-Wallet Support — Critical for Solana users who often use multiple addresses
-- [ ] Simple Notes/Tags — Basic journaling capability to differentiate from portfolio trackers
+- [ ] Trade Grouping — Group buy/sell trades into positions for better analysis
+- [ ] Advanced Journaling — Text notes, voice recordings, screenshots per trade
+- [ ] Mistake Tracking — Predefined mistake lists with custom additions
+- [ ] Daily Journaling — Daily emotional state and market metrics
+- [ ] Strategy Management — Create and track multiple strategies
 - [ ] Mobile-Responsive UI — Most crypto trading happens on mobile
-- [ ] CSV Export — Required for tax/accounting compliance
 
 ### Add After Validation (v1.x)
 
 Features to add once core is working and user feedback validates direction.
 
 - [ ] Base Chain Support — Expand to second most requested chain
-- [ ] Screenshot Integration — When users request better trade documentation
-- [ ] Basic Performance Metrics — Once sufficient trade data exists
-- [ ] Advanced Trade Import (BSC) — Third chain based on user demand
+- [ ] BSC Chain Support — Third chain based on user demand
+- [ ] Advanced Performance Metrics — Enhanced analytics and visualizations
+- [ ] Missed Trades Journal — Track and analyze opportunities not taken
+- [ ] CSV Export — Required for tax/accounting compliance
 - [ ] Simple Alert System — When users want proactive notifications
 - [ ] Enhanced Security (2FA) — When enterprise/high-value users join
 

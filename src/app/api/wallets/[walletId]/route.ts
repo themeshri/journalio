@@ -5,7 +5,7 @@ import { updateWalletSchema } from '@/lib/wallet-validation';
 import { z } from 'zod';
 
 interface RouteParams {
-  params: { walletId: string };
+  params: Promise<{ walletId: string }>;
 }
 
 export async function GET(
@@ -19,9 +19,11 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { walletId } = await params;
+    
     const wallet = await prisma.wallet.findFirst({
       where: {
-        id: params.walletId,
+        id: walletId,
         userId,
         isActive: true
       }
@@ -52,10 +54,12 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { walletId } = await params;
+
     // Verify wallet belongs to user
     const existingWallet = await prisma.wallet.findFirst({
       where: {
-        id: params.walletId,
+        id: walletId,
         userId,
         isActive: true
       }
@@ -69,7 +73,7 @@ export async function PUT(
     const validatedData = updateWalletSchema.parse(body);
 
     const wallet = await prisma.wallet.update({
-      where: { id: params.walletId },
+      where: { id: walletId },
       data: validatedData
     });
 
@@ -77,7 +81,7 @@ export async function PUT(
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid wallet data', details: error.errors },
+        { error: 'Invalid wallet data', details: error.issues },
         { status: 400 }
       );
     }
@@ -101,10 +105,12 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { walletId } = await params;
+
     // Verify wallet belongs to user
     const wallet = await prisma.wallet.findFirst({
       where: {
-        id: params.walletId,
+        id: walletId,
         userId
       }
     });
@@ -115,7 +121,7 @@ export async function DELETE(
 
     // Soft delete wallet (set isActive to false)
     await prisma.wallet.update({
-      where: { id: params.walletId },
+      where: { id: walletId },
       data: { isActive: false }
     });
 

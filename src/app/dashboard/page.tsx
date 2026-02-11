@@ -8,7 +8,7 @@ import Link from 'next/link';
 export default async function Dashboard() {
   const userId = await requireAuth();
   
-  const wallets = await prisma.wallet.findMany({
+  const walletsData = await prisma.wallet.findMany({
     where: { userId, isActive: true },
     include: {
       _count: {
@@ -17,6 +17,14 @@ export default async function Dashboard() {
     },
     orderBy: { createdAt: 'desc' }
   });
+
+  const wallets = walletsData.map(wallet => ({
+    id: wallet.id,
+    address: wallet.address,
+    chain: wallet.chain,
+    label: wallet.label ?? undefined,
+    _count: wallet._count
+  }));
 
   if (wallets.length === 0) {
     return (

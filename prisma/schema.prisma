@@ -10,6 +10,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TradeSourceEnum {
+  IMPORTED
+  MANUAL
+}
+
 model User {
   id        String   @id @default(cuid())
   clerkId   String   @unique
@@ -59,19 +64,30 @@ model Trade {
   dex         String?
   fees        Decimal  @default(0) @db.Decimal(10, 8)
   blockTime   DateTime
-  slot        BigInt
+  slot        BigInt?
   
   processed   Boolean  @default(false)
   error       String?
+  
+  // Manual trade management fields
+  source      TradeSourceEnum @default(IMPORTED)
+  isEditable  Boolean  @default(true)
+  originalData Json?   // Preserve original import data
+  notes       String?  // User notes
+  lastModified DateTime @updatedAt
+  modifiedBy  String?  // User ID who last modified
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
   positionTrades PositionTrade[]
+  auditLogs TradeAuditLog[]
   
   @@index([walletId, blockTime])
+  @@index([walletId, source])
   @@index([signature])
+  @@index([source, blockTime])
   @@map("trades")
 }
 
@@ -136,4 +152,77 @@ model PositionTrade {
   @@index([positionId])
   @@index([tradeId])
   @@map("position_trades")
+}
+
+model TradeAuditLog {
+  id          String   @id @default(cuid())
+  tradeId     String
+  userId      String
+  action      String   // CREATE, UPDATE, DELETE, ARCHIVE, RESTORE
+  fieldName   String?  // Field that was changed
+  oldValue    String?  // Previous value
+  newValue    String?  // New value
+  reason      String?  // Reason for change
+  timestamp   DateTime @default(now())
+  
+  trade Trade @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+  
+  @@index([tradeId, timestamp])
+  @@index([userId, timestamp])
+  @@map("trade_audit_logs")
+}
+
+model JournalEntry {
+  id        String   @id @default(cuid())
+  type      String   // 'trade', 'position', 'general'
+  targetId  String?  // Trade ID, Position ID, or null for general entries
+  userId    String
+  title     String
+  content   String   @db.Text
+  tags      String[] // Array of tag names
+  rating    Int?     // 1-5 stars
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  files JournalFile[]
+  
+  @@index([userId, type])
+  @@index([userId, targetId])
+  @@index([userId, createdAt])
+  @@index([tags])
+  @@map("journal_entries")
+}
+
+model JournalFile {
+  id              String   @id @default(cuid())
+  journalEntryId  String
+  fileName        String
+  fileType        String   // 'image', 'audio', 'document'
+  mimeType        String
+  fileSize        BigInt   // File size in bytes
+  storageUrl      String
+  duration        Int?     // For audio files, duration in seconds
+  transcript      String?  // Optional auto-generated transcript for audio
+  uploadedAt      DateTime @default(now())
+  
+  // Relations
+  journalEntry JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  
+  @@index([journalEntryId])
+  @@index([fileType])
+  @@map("journal_files")
+}
+
+model JournalTag {
+  id         String   @id @default(cuid())
+  name       String
+  color      String?  // Hex color for UI display
+  userId     String
+  usageCount Int      @default(1)
+  createdAt  DateTime @default(now())
+  
+  @@unique([userId, name])
+  @@index([userId, usageCount])
+  @@map("journal_tags")
 }

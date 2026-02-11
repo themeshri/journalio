@@ -157,4 +157,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**ChainJournal** - *Because every trade has a story* 📚
+**ChainJournal** - *Because every trade has a story* 📚# journalio

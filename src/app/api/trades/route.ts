@@ -45,6 +45,8 @@ export async function GET(request: NextRequest) {
       priceIn: trade.priceIn?.toNumber(),
       priceOut: trade.priceOut?.toNumber(),
       fees: trade.fees.toNumber(),
+      executedAt: trade.blockTime, // Add executedAt field that frontend expects
+      isManual: trade.source === 'MANUAL', // Add isManual field based on source
       mistakes: trade.mistakes
     }));
 
@@ -85,6 +87,8 @@ export async function POST(request: NextRequest) {
       priceIn: trade.priceIn?.toNumber(),
       priceOut: trade.priceOut?.toNumber(),
       fees: trade.fees.toNumber(),
+      executedAt: trade.blockTime, // Add executedAt field that frontend expects
+      isManual: trade.source === 'MANUAL', // Add isManual field based on source
       mistakes: trade.mistakes
     };
 

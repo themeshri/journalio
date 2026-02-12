@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { ImportTrigger } from '@/components/import/import-trigger';
+import { OKXSyncDashboard } from '@/components/okx/okx-sync-dashboard';
 
 interface WalletPageProps {
   params: Promise<{ walletId: string }>;
@@ -89,14 +90,21 @@ export default async function WalletPage({ params }: WalletPageProps) {
         </Card>
       </div>
 
-      <ImportTrigger 
-        walletId={wallet.id}
-        walletAddress={wallet.address}
-        onImportComplete={() => {
-          // This will refresh the page to show updated trade counts
-          window.location.reload();
-        }}
-      />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ImportTrigger 
+          walletId={wallet.id}
+          walletAddress={wallet.address}
+          onImportComplete={() => {
+            // This will refresh the page to show updated trade counts
+            window.location.reload();
+          }}
+        />
+        
+        <OKXSyncDashboard 
+          walletId={wallet.id}
+          walletAddress={wallet.address}
+        />
+      </div>
 
       <Card>
         <CardHeader>

@@ -7,16 +7,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { 
   Settings, User, Bell, Shield, CreditCard, Database, 
-  AlertCircle, Save, Plus, X, Trash2, Edit2 
+  AlertCircle, Save, Plus, X, Trash2, Edit2, Link2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { CustomMistakeManager } from '@/components/mistakes/custom-mistake-manager';
+// OKX is now configured via environment variables
 
 interface NotificationSettings {
   emailNotifications: boolean;
@@ -87,10 +88,11 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="trading">Trading</TabsTrigger>
+          <TabsTrigger value="integrations">Integrations</TabsTrigger>
           <TabsTrigger value="mistakes">Mistakes</TabsTrigger>
           <TabsTrigger value="billing">Billing</TabsTrigger>
         </TabsList>
@@ -341,6 +343,66 @@ export default function SettingsPage() {
               </Button>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="integrations" className="space-y-6">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>API Integrations</CardTitle>
+                <CardDescription>
+                  Connect external services to enhance your trading journal
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Integrate with exchanges and data providers to automatically import trades and market data.
+                  </p>
+                  
+                  {/* OKX Integration Status */}
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">OKX API</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Automatically fetch transaction history from Solana wallets
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {process.env.NEXT_PUBLIC_OKX_CONFIGURED === 'true' ? (
+                        <Badge variant="default">Configured via Environment</Badge>
+                      ) : (
+                        <Badge variant="outline">Configured via .env file</Badge>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <Alert>
+                    <Link2 className="h-4 w-4" />
+                    <AlertTitle>OKX Configuration</AlertTitle>
+                    <AlertDescription>
+                      <div className="space-y-2">
+                        <p>OKX API credentials are configured via environment variables in your .env.local file for security.</p>
+                        <p className="font-mono text-sm bg-slate-100 p-2 rounded">
+                          OKX_API_KEY=your-real-api-key<br/>
+                          OKX_SECRET_KEY=your-real-secret-key<br/>
+                          OKX_PASSPHRASE=your-real-passphrase
+                        </p>
+                        <p className="text-sm">After updating credentials, restart the development server to apply changes.</p>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Alert>
+              <Link2 className="h-4 w-4" />
+              <AlertDescription>
+                More integrations coming soon: Binance, Coinbase, Jupiter, and direct Solana RPC connections.
+              </AlertDescription>
+            </Alert>
+          </div>
         </TabsContent>
 
         <TabsContent value="mistakes" className="space-y-6">

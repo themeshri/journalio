@@ -1,5 +1,5 @@
-import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth';
 import { SyncScheduler } from '@/lib/scheduler';
 import { z } from 'zod';
 
@@ -10,11 +10,7 @@ const syncRequestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = await requireAuth();
 
     const body = await request.json();
     const { walletId, all } = syncRequestSchema.parse(body);
@@ -73,11 +69,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = await requireAuth();
 
     // Get sync status for user's wallets
     const walletStatus = await SyncScheduler.getUserWalletSyncStatus(userId);

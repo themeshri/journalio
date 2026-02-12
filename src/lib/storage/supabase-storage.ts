@@ -163,3 +163,14 @@ export async function deleteFile(filePath: string): Promise<{ success: boolean; 
 export function getFileUrl(filePath: string): string {
   return `https://demo-storage.chainjournal.app/${filePath}`;
 }
+
+// Get file type from MIME type
+export function getFileTypeFromMime(mimeType: string): 'image' | 'audio' | 'document' {
+  if (ALLOWED_IMAGE_TYPES.includes(mimeType)) {
+    return 'image';
+  }
+  if (ALLOWED_AUDIO_TYPES.includes(mimeType)) {
+    return 'audio';
+  }
+  return 'document';
+}

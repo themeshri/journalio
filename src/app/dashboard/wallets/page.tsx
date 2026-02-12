@@ -6,21 +6,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Plus, Wallet, ExternalLink, RefreshCw, Trash2, AlertCircle, Copy, Check } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus, Wallet, ExternalLink, RefreshCw, Trash2, AlertCircle, Copy, Check, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
 interface WalletData {
   id: string;
   address: string;
-  name: string;
-  chain: 'SOLANA' | 'BASE' | 'BSC';
+  label: string | null;
+  chain: string;
   isActive: boolean;
   lastSync?: string;
-  tradeCount: number;
-  totalVolume: number;
-  pnl: number;
+  tradeCount?: number;
+  totalVolume?: number;
+  pnl?: number;
   createdAt: string;
+  updatedAt: string;
 }
 
 export default function WalletsPage() {
@@ -29,6 +33,13 @@ export default function WalletsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [syncingWalletId, setSyncingWalletId] = useState<string | null>(null);
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newWallet, setNewWallet] = useState({
+    address: '',
+    label: '',
+    chain: 'SOLANA'
+  });
 
   useEffect(() => {
     loadWallets();
@@ -40,7 +51,7 @@ export default function WalletsPage() {
       const response = await fetch('/api/wallets');
       if (response.ok) {
         const data = await response.json();
-        setWallets(data.wallets || []);
+        setWallets(data || []);
       }
     } catch (error) {
       console.error('Failed to load wallets:', error);
@@ -53,18 +64,36 @@ export default function WalletsPage() {
   const handleSync = async (walletId: string) => {
     try {
       setSyncingWalletId(walletId);
-      const response = await fetch('/api/sync', {
+      
+      // Find the wallet to get its address
+      const wallet = wallets.find(w => w.id === walletId);
+      if (!wallet) {
+        toast.error('Wallet not found');
+        return;
+      }
+
+      const response = await fetch('/api/okx/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ walletId }),
+        body: JSON.stringify({ 
+          walletId: wallet.id,
+          walletAddress: wallet.address,
+          syncType: '24h'
+        }),
       });
 
       if (response.ok) {
-        toast.success('Sync started successfully');
+        const result = await response.json();
+        if (result.success) {
+          toast.success(result.message || 'Sync completed successfully');
+        } else {
+          toast.error(result.message || 'Sync failed');
+        }
         // Reload wallets to get updated sync status
         await loadWallets();
       } else {
-        toast.error('Failed to start sync');
+        const error = await response.json();
+        toast.error(error.error || 'Failed to start sync');
       }
     } catch (error) {
       console.error('Sync error:', error);
@@ -75,12 +104,12 @@ export default function WalletsPage() {
   };
 
   const handleDelete = async (walletId: string) => {
-    if (!confirm('Are you sure you want to remove this wallet? This will not delete historical trade data.')) {
+    if (!confirm('Are you sure you want to remove this wallet? This will also delete all associated trades and data.')) {
       return;
     }
 
     try {
-      const response = await fetch(`/api/wallets/${walletId}`, {
+      const response = await fetch(`/api/wallets?id=${walletId}`, {
         method: 'DELETE',
       });
 
@@ -93,6 +122,42 @@ export default function WalletsPage() {
     } catch (error) {
       console.error('Delete error:', error);
       toast.error('Failed to remove wallet');
+    }
+  };
+
+  const handleAddWallet = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newWallet.address.trim()) {
+      toast.error('Wallet address is required');
+      return;
+    }
+
+    setIsAdding(true);
+    try {
+      const response = await fetch('/api/wallets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          address: newWallet.address.trim(),
+          label: newWallet.label.trim() || null,
+          chain: newWallet.chain
+        })
+      });
+
+      if (response.ok) {
+        toast.success('Wallet added successfully');
+        setNewWallet({ address: '', label: '', chain: 'SOLANA' });
+        setShowAddForm(false);
+        await loadWallets();
+      } else {
+        const error = await response.json();
+        toast.error(error.error || 'Failed to add wallet');
+      }
+    } catch (error) {
+      console.error('Add wallet error:', error);
+      toast.error('Failed to add wallet');
+    } finally {
+      setIsAdding(false);
     }
   };
 
@@ -124,13 +189,103 @@ export default function WalletsPage() {
             Manage your connected wallets and sync trading data
           </p>
         </div>
-        <Button onClick={() => router.push('/dashboard/wallets/add')}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Wallet
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant={showAddForm ? "outline" : "default"}
+            onClick={() => {
+              setShowAddForm(!showAddForm);
+              if (showAddForm) {
+                setNewWallet({ address: '', label: '', chain: 'SOLANA' });
+              }
+            }}
+          >
+            {showAddForm ? (
+              <X className="h-4 w-4 mr-2" />
+            ) : (
+              <Plus className="h-4 w-4 mr-2" />
+            )}
+            {showAddForm ? 'Cancel' : 'Add Wallet'}
+          </Button>
+        </div>
       </div>
 
-      {wallets.length === 0 && !isLoading ? (
+      {/* Add Wallet Form */}
+      {showAddForm && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Add New Wallet</CardTitle>
+            <CardDescription>
+              Add a wallet address to start tracking your trades
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleAddWallet} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-span-2 space-y-2">
+                  <Label htmlFor="address">Wallet Address *</Label>
+                  <Input
+                    id="address"
+                    placeholder="Enter wallet address"
+                    value={newWallet.address}
+                    onChange={(e) => setNewWallet({ ...newWallet, address: e.target.value })}
+                    disabled={isAdding}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="chain">Chain</Label>
+                  <Select 
+                    value={newWallet.chain} 
+                    onValueChange={(value) => setNewWallet({ ...newWallet, chain: value })}
+                  >
+                    <SelectTrigger id="chain">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="SOLANA">Solana</SelectItem>
+                      <SelectItem value="BASE">Base</SelectItem>
+                      <SelectItem value="BSC">BSC</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="label">Label (optional)</Label>
+                <Input
+                  id="label"
+                  placeholder="Enter a label for this wallet"
+                  value={newWallet.label}
+                  onChange={(e) => setNewWallet({ ...newWallet, label: e.target.value })}
+                  disabled={isAdding}
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button type="submit" disabled={isAdding}>
+                  {isAdding ? (
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Plus className="h-4 w-4 mr-2" />
+                  )}
+                  {isAdding ? 'Adding...' : 'Add Wallet'}
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => {
+                    setShowAddForm(false);
+                    setNewWallet({ address: '', label: '', chain: 'SOLANA' });
+                  }}
+                  disabled={isAdding}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      {wallets.length === 0 && !isLoading && !showAddForm ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Wallet className="h-12 w-12 text-muted-foreground mb-4" />
@@ -138,7 +293,7 @@ export default function WalletsPage() {
             <p className="text-sm text-muted-foreground text-center mb-6">
               Add your first wallet to start tracking your trades
             </p>
-            <Button onClick={() => router.push('/dashboard/wallets/add')}>
+            <Button onClick={() => setShowAddForm(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Add Your First Wallet
             </Button>
@@ -163,7 +318,9 @@ export default function WalletsPage() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
-                      <CardTitle className="text-lg">{wallet.name}</CardTitle>
+                      <CardTitle className="text-lg">
+                        {wallet.label || `${wallet.address.slice(0, 8)}...${wallet.address.slice(-6)}`}
+                      </CardTitle>
                       <div className="flex items-center gap-2">
                         <Badge className={getChainColor(wallet.chain)}>
                           {wallet.chain}
@@ -193,12 +350,16 @@ export default function WalletsPage() {
                   <div className="grid grid-cols-2 gap-4 pt-2">
                     <div>
                       <p className="text-sm text-muted-foreground">Trades</p>
-                      <p className="text-lg font-semibold">{wallet.tradeCount}</p>
+                      <p className="text-lg font-semibold">{wallet.tradeCount || 0}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">P&L</p>
-                      <p className={`text-lg font-semibold ${wallet.pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {wallet.pnl >= 0 ? '+' : ''}{wallet.pnl.toFixed(2)}%
+                      <p className="text-sm text-muted-foreground">Status</p>
+                      <p className="text-sm">
+                        {wallet.isActive ? (
+                          <Badge variant="default">Active</Badge>
+                        ) : (
+                          <Badge variant="secondary">Inactive</Badge>
+                        )}
                       </p>
                     </div>
                   </div>

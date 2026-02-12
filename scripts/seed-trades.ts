@@ -9,7 +9,7 @@ async function main() {
     // First check if wallet exists
     let wallet = await prisma.wallet.findFirst({
       where: {
-        userId: 'dev-user-123',
+        // userId: 'dev-user-123',
         address: '7xKXtg2CW87d7TXQ4q6Zqm2Z7Xqr4q5X4q5X4q5X4q5X',
         chain: 'SOLANA'
       }
@@ -40,14 +40,14 @@ async function main() {
         amountOut: 5000000,
         priceIn: 95.50,
         priceOut: 0.0000191,
-        executedAt: new Date('2024-02-10T10:30:00'),
-        transactionHash: '3nX9h2K4m5L6p7Q8r9S1t2U3v4W5x6Y7z8A9b1C2d3E4',
+        blockTime: new Date('2024-02-10T10:30:00'),
+        signature: '3nX9h2K4m5L6p7Q8r9S1t2U3v4W5x6Y7z8A9b1C2d3E4',
         dex: 'Jupiter',
         fees: 0.005,
         walletId: wallet.id,
-        userId: 'dev-user-123',
+        // userId: 'dev-user-123',
         notes: 'Saw increasing volume, good entry point',
-        isManual: false,
+        // isManual: false,
       },
       {
         type: 'SELL' as const,
@@ -57,14 +57,14 @@ async function main() {
         amountOut: 5.2,
         priceIn: 0.0000208,
         priceOut: 96.15,
-        executedAt: new Date('2024-02-10T14:45:00'),
-        transactionHash: '4nX9h2K4m5L6p7Q8r9S1t2U3v4W5x6Y7z8A9b1C2d3E5',
+        blockTime: new Date('2024-02-10T14:45:00'),
+        signature: '4nX9h2K4m5L6p7Q8r9S1t2U3v4W5x6Y7z8A9b1C2d3E5',
         dex: 'Raydium',
         fees: 0.003,
         walletId: wallet.id,
-        userId: 'dev-user-123',
+        // userId: 'dev-user-123',
         notes: 'Taking partial profits at resistance',
-        isManual: false,
+        // isManual: false,
       },
       {
         type: 'BUY' as const,
@@ -74,14 +74,14 @@ async function main() {
         amountOut: 150,
         priceIn: 1,
         priceOut: 3.33,
-        executedAt: new Date('2024-02-09T09:15:00'),
-        transactionHash: '5nX9h2K4m5L6p7Q8r9S1t2U3v4W5x6Y7z8A9b1C2d3E6',
+        blockTime: new Date('2024-02-09T09:15:00'),
+        signature: '5nX9h2K4m5L6p7Q8r9S1t2U3v4W5x6Y7z8A9b1C2d3E6',
         dex: 'Orca',
         fees: 0.75,
         walletId: wallet.id,
-        userId: 'dev-user-123',
+        // userId: 'dev-user-123',
         notes: 'Dogwifhat looking strong, momentum play',
-        isManual: false,
+        // isManual: false,
       },
       {
         type: 'SELL' as const,
@@ -91,14 +91,14 @@ async function main() {
         amountOut: 600,
         priceIn: 4.00,
         priceOut: 1,
-        executedAt: new Date('2024-02-11T11:20:00'),
-        transactionHash: '6nX9h2K4m5L6p7Q8r9S1t2U3v4W5x6Y7z8A9b1C2d3E7',
+        blockTime: new Date('2024-02-11T11:20:00'),
+        signature: '6nX9h2K4m5L6p7Q8r9S1t2U3v4W5x6Y7z8A9b1C2d3E7',
         dex: 'Jupiter',
         fees: 0.90,
         walletId: wallet.id,
-        userId: 'dev-user-123',
+        // userId: 'dev-user-123',
         notes: 'Great trade! +20% profit',
-        isManual: false,
+        // isManual: false,
       },
       {
         type: 'BUY' as const,
@@ -108,14 +108,14 @@ async function main() {
         amountOut: 625,
         priceIn: 94.80,
         priceOut: 3.79,
-        executedAt: new Date('2024-02-08T16:30:00'),
-        transactionHash: '7nX9h2K4m5L6p7Q8r9S1t2U3v4W5x6Y7z8A9b1C2d3E8',
+        blockTime: new Date('2024-02-08T16:30:00'),
+        signature: '7nX9h2K4m5L6p7Q8r9S1t2U3v4W5x6Y7z8A9b1C2d3E8',
         dex: 'Raydium',
         fees: 0.0125,
         walletId: wallet.id,
-        userId: 'dev-user-123',
+        // userId: 'dev-user-123',
         notes: 'JTO airdrop news, expecting pump',
-        isManual: true,
+        // isManual: true,
       },
       {
         type: 'BUY' as const,
@@ -125,14 +125,14 @@ async function main() {
         amountOut: 2500,
         priceIn: 1,
         priceOut: 0.40,
-        executedAt: new Date('2024-02-07T13:00:00'),
-        transactionHash: '8nX9h2K4m5L6p7Q8r9S1t2U3v4W5x6Y7z8A9b1C2d3E9',
+        blockTime: new Date('2024-02-07T13:00:00'),
+        signature: '8nX9h2K4m5L6p7Q8r9S1t2U3v4W5x6Y7z8A9b1C2d3E9',
         dex: 'Orca',
         fees: 1.5,
         walletId: wallet.id,
-        userId: 'dev-user-123',
+        // userId: 'dev-user-123',
         notes: 'Oracle play, mainnet launch coming',
-        isManual: false,
+        // isManual: false,
       },
       {
         type: 'SELL' as const,
@@ -142,14 +142,14 @@ async function main() {
         amountOut: 450,
         priceIn: 0.45,
         priceOut: 1,
-        executedAt: new Date('2024-02-08T10:15:00'),
-        transactionHash: '9nX9h2K4m5L6p7Q8r9S1t2U3v4W5x6Y7z8A9b1C2d3E0',
+        blockTime: new Date('2024-02-08T10:15:00'),
+        signature: '9nX9h2K4m5L6p7Q8r9S1t2U3v4W5x6Y7z8A9b1C2d3E0',
         dex: 'Jupiter',
         fees: 0.675,
         walletId: wallet.id,
-        userId: 'dev-user-123',
+        // userId: 'dev-user-123',
         notes: 'Quick scalp trade, +12.5%',
-        isManual: false,
+        // isManual: false,
       },
       {
         type: 'BUY' as const,
@@ -159,20 +159,24 @@ async function main() {
         amountOut: 200,
         priceIn: 93.00,
         priceOut: 6.975,
-        executedAt: new Date('2024-02-06T08:45:00'),
-        transactionHash: '1aX9h2K4m5L6p7Q8r9S1t2U3v4W5x6Y7z8A9b1C2d3E1',
+        blockTime: new Date('2024-02-06T08:45:00'),
+        signature: '1aX9h2K4m5L6p7Q8r9S1t2U3v4W5x6Y7z8A9b1C2d3E1',
         dex: 'Raydium',
         fees: 0.0075,
         walletId: wallet.id,
-        userId: 'dev-user-123',
+        // userId: 'dev-user-123',
         notes: 'AI narrative still strong',
-        isManual: true,
+        // isManual: true,
       },
     ];
 
     // Check if trades already exist
     const existingTrades = await prisma.trade.count({
-      where: { userId: 'dev-user-123' }
+      where: { 
+        wallet: {
+          // userId: 'dev-user-123'
+        }
+      }
     });
 
     if (existingTrades > 0) {
@@ -190,38 +194,36 @@ async function main() {
     // Create predefined mistake categories if they don't exist
     const mistakeCategories = [
       {
-        code: 'FOMO_ENTRY',
         name: 'FOMO Entry',
         description: 'Entered trade due to fear of missing out',
-        severity: 'HIGH' as const,
-        color: '#ef4444',
+        category: 'EMOTIONAL' as const,
+        userId: 'dev-user-123',
       },
       {
-        code: 'POOR_RISK_MGMT',
         name: 'Poor Risk Management',
         description: 'Position size too large or no stop loss',
-        severity: 'HIGH' as const,
-        color: '#dc2626',
+        category: 'RISK_MANAGEMENT' as const,
+        userId: 'dev-user-123',
       },
       {
-        code: 'EARLY_EXIT',
+        // code: 'EARLY_EXIT',
         name: 'Early Exit',
         description: 'Exited position too early, left profits on table',
-        severity: 'MEDIUM' as const,
-        color: '#f97316',
+        // severity: 'MEDIUM' as const,
+        // color: '#f97316',
       },
       {
-        code: 'NO_PLAN',
+        // code: 'NO_PLAN',
         name: 'No Trading Plan',
         description: 'Entered without clear entry/exit strategy',
-        severity: 'MEDIUM' as const,
-        color: '#fb923c',
+        // severity: 'MEDIUM' as const,
+        // color: '#fb923c',
       },
     ];
 
     for (const category of mistakeCategories) {
       const existing = await prisma.mistakeCategory.findFirst({
-        where: { code: category.code }
+        where: { userId: 'dev-user-123', name: category.name }
       });
       
       if (!existing) {

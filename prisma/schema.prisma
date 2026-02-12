@@ -42,6 +42,7 @@ model Wallet {
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   trades Trade[]
   importJobs ImportJob[]
+  okxSyncStatus OKXSyncStatus?
   
   @@unique([userId, address, chain])
   @@index([userId, isActive])
@@ -77,6 +78,12 @@ model Trade {
   lastModified DateTime @updatedAt
   modifiedBy  String?  // User ID who last modified
   
+  // OKX integration fields
+  okxTxHash     String?   @unique // Prevent duplicate imports from OKX
+  okxImportedAt DateTime? // Track when imported from OKX
+  okxRawData    Json?     // Store original OKX response
+  dataSource    String    @default("manual") // "manual" | "okx" | "solana-rpc"
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
@@ -89,6 +96,8 @@ model Trade {
   @@index([walletId, source])
   @@index([signature])
   @@index([source, blockTime])
+  @@index([okxTxHash])
+  @@index([dataSource])
   @@map("trades")
 }
 
@@ -308,4 +317,38 @@ model CustomMistake {
   @@index([userId, categoryId])
   @@index([usageCount])
   @@map("custom_mistakes")
+}
+
+// OKX Integration Models
+model OKXSyncStatus {
+  id                    String   @id @default(cuid())
+  walletId              String   @unique
+  wallet                Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  lastSyncAt            DateTime?
+  lastCursor            String?  // For pagination
+  transactionsImported  Int      @default(0)
+  syncStatus            String   @default("idle") // "success" | "failed" | "in_progress" | "idle"
+  errors                Json?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@index([walletId])
+  @@index([syncStatus])
+  @@map("okx_sync_status")
+}
+
+model OKXApiConfig {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  apiKey      String    // Will be encrypted
+  secretKey   String    // Will be encrypted
+  passphrase  String    // Will be encrypted
+  isActive    Boolean   @default(true)
+  lastUsed    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@index([userId])
+  @@index([isActive])
+  @@map("okx_api_configs")
 }

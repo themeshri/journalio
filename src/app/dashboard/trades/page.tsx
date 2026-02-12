@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search, Filter, Edit, Copy, AlertCircle, TrendingDown } from 'lucide-react';
+import { Plus, Search, Filter, Edit, Copy, AlertCircle, TrendingDown, Download, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -37,29 +37,121 @@ interface Trade {
   }>;
 }
 
+interface Wallet {
+  id: string;
+  address: string;
+  chain: string;
+  label: string | null;
+  isActive: boolean;
+}
+
 export default function TradesPage() {
   const router = useRouter();
   const [trades, setTrades] = useState<Trade[]>([]);
+  const [wallets, setWallets] = useState<Wallet[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'BUY' | 'SELL'>('all');
 
   useEffect(() => {
-    loadTrades();
+    loadData();
   }, []);
 
-  const loadTrades = async () => {
+  const loadData = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/trades');
-      if (response.ok) {
-        const data = await response.json();
-        setTrades(data.trades || []);
+      
+      // Load trades and wallets in parallel
+      const [tradesResponse, walletsResponse] = await Promise.all([
+        fetch('/api/trades'),
+        fetch('/api/wallets')
+      ]);
+      
+      if (tradesResponse.ok) {
+        const tradesData = await tradesResponse.json();
+        setTrades(tradesData.trades || []);
+      }
+      
+      if (walletsResponse.ok) {
+        const walletsData = await walletsResponse.json();
+        setWallets(walletsData || []);
       }
     } catch (error) {
-      console.error('Failed to load trades:', error);
+      console.error('Failed to load data:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchNewTrades = async () => {
+    if (wallets.length === 0) {
+      alert('No wallets available. Please add a wallet first.');
+      return;
+    }
+
+    setIsFetching(true);
+    
+    try {
+      // Fetch from all wallets
+      const results = await Promise.all(
+        wallets.map(async (wallet) => {
+          try {
+            const response = await fetch('/api/okx/sync', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                walletId: wallet.id,
+                walletAddress: wallet.address,
+                syncType: '24h'
+              })
+            });
+            
+            if (response.ok) {
+              const result = await response.json();
+              return { wallet: wallet.label || wallet.address, ...result };
+            } else {
+              const error = await response.json();
+              return { 
+                wallet: wallet.label || wallet.address, 
+                success: false, 
+                error: error.error || 'Failed to sync'
+              };
+            }
+          } catch (error) {
+            return { 
+              wallet: wallet.label || wallet.address, 
+              success: false, 
+              error: 'Network error'
+            };
+          }
+        })
+      );
+      
+      // Show results summary
+      const successful = results.filter(r => r.success).length;
+      const totalSaved = results.reduce((acc, r) => acc + (r.totalSaved || 0), 0);
+      
+      if (successful > 0) {
+        alert(`✅ Successfully synced ${totalSaved} new transactions from ${successful}/${wallets.length} wallets`);
+        // Reload trades to show new data
+        loadData();
+      } else {
+        // Check if any results have a helpful configuration message
+        const configMessage = results.find(r => r.message && r.message.includes('🔧'));
+        if (configMessage) {
+          alert(`⚙️ Configuration needed:\n\n${configMessage.message}`);
+        } else {
+          alert(`❌ Failed to sync from all wallets. Check console for details.`);
+        }
+      }
+      
+      console.log('OKX sync results:', results);
+    } catch (error) {
+      console.error('Failed to fetch new trades:', error);
+      alert('❌ Failed to fetch new trades. Please try again.');
+    } finally {
+      setIsFetching(false);
     }
   };
 
@@ -110,11 +202,36 @@ export default function TradesPage() {
           <p className="text-muted-foreground">
             Manage your trading history and journal entries
           </p>
+          {wallets.length > 0 && (
+            <div className="flex items-center gap-2 mt-2">
+              <span className="text-sm text-muted-foreground">Connected wallets:</span>
+              {wallets.map((wallet, index) => (
+                <Badge key={wallet.id} variant="outline" className="text-xs">
+                  {wallet.label || `${wallet.address.slice(0, 4)}...${wallet.address.slice(-4)}`}
+                  {wallet.chain === 'SOLANA' && ' (SOL)'}
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
-        <Button onClick={() => router.push('/dashboard/trades/add')}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Manual Trade
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            onClick={fetchNewTrades}
+            disabled={isFetching || wallets.length === 0}
+          >
+            {isFetching ? (
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4 mr-2" />
+            )}
+            {isFetching ? 'Fetching...' : 'Fetch New Trades'}
+          </Button>
+          <Button onClick={() => router.push('/dashboard/trades/add')}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Manual Trade
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -154,12 +271,34 @@ export default function TradesPage() {
               <TrendingDown className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium">No trades found</h3>
               <p className="text-sm text-muted-foreground mt-2">
-                Add your first trade or import from your wallet
+                {wallets.length === 0 
+                  ? 'Add a wallet first to start importing trades'
+                  : 'Add your first trade or import from your wallet'
+                }
               </p>
-              <Button onClick={() => router.push('/dashboard/trades/add')} className="mt-4">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Manual Trade
-              </Button>
+              <div className="flex justify-center gap-2 mt-4">
+                {wallets.length === 0 ? (
+                  <Button onClick={() => router.push('/dashboard/wallets')}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Wallet
+                  </Button>
+                ) : (
+                  <>
+                    <Button variant="outline" onClick={fetchNewTrades} disabled={isFetching}>
+                      {isFetching ? (
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Download className="h-4 w-4 mr-2" />
+                      )}
+                      {isFetching ? 'Fetching...' : 'Fetch New Trades'}
+                    </Button>
+                    <Button onClick={() => router.push('/dashboard/trades/add')}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Manual Trade
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
           ) : (
             <div className="space-y-4">

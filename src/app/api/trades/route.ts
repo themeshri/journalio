@@ -1,18 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { requireAuth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
 // GET: Fetch all trades for the authenticated user
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = await requireAuth();
 
     // First ensure user has a wallet
     let wallet = await prisma.wallet.findFirst({
-      where: { userId: session.userId }
+      where: { userId }
     });
 
     if (!wallet) {
@@ -23,6 +20,7 @@ export async function GET(request: NextRequest) {
           label: 'Main Trading Wallet',
           chain: 'SOLANA',
           isActive: true,
+          userId
         }
       });
     }
@@ -31,15 +29,10 @@ export async function GET(request: NextRequest) {
 
     // Fetch trades with mistake information
     const trades = await prisma.trade.findMany({
-      where: { wallet: { userId: session.userId } },
+      where: { wallet: { userId } },
       include: {
         wallet: true,
-        mistakes: {
-          include: {
-            category: true,
-            customMistake: true
-          }
-        }
+        mistakes: true
       },
       orderBy: { blockTime: 'desc' }
     });
@@ -52,19 +45,7 @@ export async function GET(request: NextRequest) {
       priceIn: trade.priceIn?.toNumber(),
       priceOut: trade.priceOut?.toNumber(),
       fees: trade.fees.toNumber(),
-      mistakes: trade.mistakes?.map(m => ({
-        id: m.id,
-        mistakeType: m.mistakeType,
-        severity: m.severity,
-        category: m.category ? {
-          name: m.category.name,
-          color: m.category.color
-        } : null,
-        customMistake: m.customMistake ? {
-          name: m.customMistake.name,
-          color: m.customMistake.color
-        } : null
-      }))
+      mistakes: trade.mistakes
     }));
 
     return NextResponse.json({ trades: transformedTrades });
@@ -80,10 +61,7 @@ export async function GET(request: NextRequest) {
 // POST: Create a new trade
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = await requireAuth();
 
     const body = await request.json();
     
@@ -91,16 +69,11 @@ export async function POST(request: NextRequest) {
     const trade = await prisma.trade.create({
       data: {
         ...body,
-        userId: session.userId,
+        userId,
         isManual: true
       },
       include: {
-        mistakes: {
-          include: {
-            category: true,
-            customMistake: true
-          }
-        }
+        mistakes: true
       }
     });
 
@@ -112,13 +85,7 @@ export async function POST(request: NextRequest) {
       priceIn: trade.priceIn?.toNumber(),
       priceOut: trade.priceOut?.toNumber(),
       fees: trade.fees.toNumber(),
-      mistakes: trade.mistakes?.map(m => ({
-        id: m.id,
-        mistakeType: m.mistakeType,
-        severity: m.severity,
-        category: m.category,
-        customMistake: m.customMistake
-      }))
+      mistakes: trade.mistakes
     };
 
     return NextResponse.json({ trade: transformedTrade }, { status: 201 });

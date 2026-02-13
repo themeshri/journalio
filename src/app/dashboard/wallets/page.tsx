@@ -72,7 +72,7 @@ export default function WalletsPage() {
         return;
       }
 
-      const response = await fetch('/api/okx/sync', {
+      const response = await fetch('/api/zerion/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

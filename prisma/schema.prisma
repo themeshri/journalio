@@ -13,6 +13,7 @@ datasource db {
 enum TradeSourceEnum {
   IMPORTED
   MANUAL
+  ZERION
 }
 
 model User {
@@ -42,7 +43,8 @@ model Wallet {
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   trades Trade[]
   importJobs ImportJob[]
-  okxSyncStatus OKXSyncStatus?
+  okxSyncStatus OKXSyncStatus? // Legacy - kept for migration
+  zerionSyncStatus ZerionSyncStatus?
   
   @@unique([userId, address, chain])
   @@index([userId, isActive])
@@ -78,11 +80,19 @@ model Trade {
   lastModified DateTime @updatedAt
   modifiedBy  String?  // User ID who last modified
   
-  // OKX integration fields
-  okxTxHash     String?   @unique // Prevent duplicate imports from OKX
-  okxImportedAt DateTime? // Track when imported from OKX
-  okxRawData    Json?     // Store original OKX response
-  dataSource    String    @default("manual") // "manual" | "okx" | "solana-rpc"
+  // Legacy OKX fields (deprecated - kept for migration)
+  okxTxHash     String?   @unique // Legacy field - kept for data migration
+  okxImportedAt DateTime? // Legacy field - kept for data migration  
+  okxRawData    Json?     // Legacy field - kept for data migration
+  
+  // Zerion integration fields
+  zerionTxId       String?   @unique // Prevent duplicate imports from Zerion
+  zerionOperationType String? // operation_type from Zerion (trade, send, receive, etc.)
+  zerionImportedAt DateTime? // Track when imported from Zerion
+  zerionRawData    Json?     // Store original Zerion response
+  zerionConfidence String?   // Transformation confidence (high, medium, low)
+  
+  dataSource    String    @default("manual") // "manual" | "zerion" | "solana-rpc" | "okx" (legacy)
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -97,6 +107,8 @@ model Trade {
   @@index([signature])
   @@index([source, blockTime])
   @@index([okxTxHash])
+  @@index([zerionTxId])
+  @@index([zerionOperationType])
   @@index([dataSource])
   @@map("trades")
 }
@@ -319,7 +331,7 @@ model CustomMistake {
   @@map("custom_mistakes")
 }
 
-// OKX Integration Models
+// Legacy OKX Integration Models (Deprecated - kept for migration)
 model OKXSyncStatus {
   id                    String   @id @default(cuid())
   walletId              String   @unique
@@ -337,7 +349,29 @@ model OKXSyncStatus {
   @@map("okx_sync_status")
 }
 
-model OKXApiConfig {
+model ZerionSyncStatus {
+  id                    String   @id @default(cuid())
+  walletId              String   @unique
+  wallet                Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  lastSyncAt            DateTime?
+  lastCursor            String?  // For pagination
+  transactionsImported  Int      @default(0)
+  syncStatus            String   @default("idle") // "success" | "failed" | "in_progress" | "idle"
+  errors                Json?
+  highConfidenceCount   Int      @default(0)
+  mediumConfidenceCount Int      @default(0)
+  lowConfidenceCount    Int      @default(0)
+  lastFetchDuration     Int?     // Duration in seconds
+  apiCallCount          Int      @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@index([walletId])
+  @@index([syncStatus])
+  @@map("zerion_sync_status")
+}
+
+model OKXApiConfig { // Deprecated - kept for migration
   id          String    @id @default(cuid())
   userId      String    @unique
   apiKey      String    // Will be encrypted

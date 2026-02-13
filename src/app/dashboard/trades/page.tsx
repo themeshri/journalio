@@ -97,7 +97,7 @@ export default function TradesPage() {
       const results = await Promise.all(
         wallets.map(async (wallet) => {
           try {
-            const response = await fetch('/api/okx/sync', {
+            const response = await fetch('/api/zerion/sync', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -146,7 +146,7 @@ export default function TradesPage() {
         }
       }
       
-      console.log('OKX sync results:', results);
+      console.log('Zerion sync results:', results);
     } catch (error) {
       console.error('Failed to fetch new trades:', error);
       alert('❌ Failed to fetch new trades. Please try again.');

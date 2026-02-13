@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server';
+import { requireAuth } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { updateWalletSchema } from '@/lib/wallet-validation';
@@ -13,11 +13,7 @@ export async function GET(
   { params }: RouteParams
 ) {
   try {
-    const { userId } = await auth();
-    
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = await requireAuth();
 
     const { walletId } = await params;
     
@@ -48,11 +44,7 @@ export async function PUT(
   { params }: RouteParams
 ) {
   try {
-    const { userId } = await auth();
-    
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = await requireAuth();
 
     const { walletId } = await params;
 
@@ -99,11 +91,7 @@ export async function DELETE(
   { params }: RouteParams
 ) {
   try {
-    const { userId } = await auth();
-    
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = await requireAuth();
 
     const { walletId } = await params;
 

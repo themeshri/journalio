@@ -222,7 +222,7 @@ export default function ImportPage() {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  We'll import all DEX trades from this wallet using the OKX API.
+                  We'll import all DEX trades from this wallet using the Zerion API.
                   This may take a few minutes depending on your trading history.
                 </AlertDescription>
               </Alert>

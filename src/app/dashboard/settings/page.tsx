@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { CustomMistakeManager } from '@/components/mistakes/custom-mistake-manager';
-// OKX is now configured via environment variables
+// Zerion is configured via environment variables
 
 interface NotificationSettings {
   emailNotifications: boolean;
@@ -360,16 +360,16 @@ export default function SettingsPage() {
                     Integrate with exchanges and data providers to automatically import trades and market data.
                   </p>
                   
-                  {/* OKX Integration Status */}
+                  {/* Zerion Integration Status */}
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div>
-                      <h4 className="font-medium">OKX API</h4>
+                      <h4 className="font-medium">Zerion API</h4>
                       <p className="text-sm text-muted-foreground">
-                        Automatically fetch transaction history from Solana wallets
+                        Primary transaction history provider with superior data quality and price coverage
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {process.env.NEXT_PUBLIC_OKX_CONFIGURED === 'true' ? (
+                      {process.env.NEXT_PUBLIC_ZERION_CONFIGURED === 'true' ? (
                         <Badge variant="default">Configured via Environment</Badge>
                       ) : (
                         <Badge variant="outline">Configured via .env file</Badge>
@@ -379,16 +379,17 @@ export default function SettingsPage() {
                   
                   <Alert>
                     <Link2 className="h-4 w-4" />
-                    <AlertTitle>OKX Configuration</AlertTitle>
+                    <AlertTitle>Zerion Configuration</AlertTitle>
                     <AlertDescription>
                       <div className="space-y-2">
-                        <p>OKX API credentials are configured via environment variables in your .env.local file for security.</p>
+                        <p>Zerion API credentials are configured via environment variables in your .env.local file for security.</p>
                         <p className="font-mono text-sm bg-slate-100 p-2 rounded">
-                          OKX_API_KEY=your-real-api-key<br/>
-                          OKX_SECRET_KEY=your-real-secret-key<br/>
-                          OKX_PASSPHRASE=your-real-passphrase
+                          ZERION_API_KEY=your-zerion-api-key<br/>
+                          DEFAULT_SYNC_PROVIDER=zerion<br/>
+                          ENABLE_ZERION_SYNC=true
                         </p>
                         <p className="text-sm">After updating credentials, restart the development server to apply changes.</p>
+                        <p className="text-xs text-green-600 mt-2">✅ Zerion provides richer transaction data, better price coverage, and confidence scoring</p>
                       </div>
                     </AlertDescription>
                   </Alert>

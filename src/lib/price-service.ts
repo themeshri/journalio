@@ -1,4 +1,4 @@
-import { okxClient } from './okx-client';
+// Price service - now relies on Zerion for price data
 
 export interface TokenPrice {
   mint: string;
@@ -28,32 +28,14 @@ export class PriceService {
       }
     }
 
-    // Fetch uncached prices
+    // Note: Price fetching is now handled by Zerion during transaction sync
+    // This service maintains cached prices for display purposes
+    // Fresh prices come from Zerion API during transaction transformation
     if (uncachedMints.length > 0) {
-      try {
-        const freshPrices = await okxClient.getTokenPrices(uncachedMints);
-        
-        for (const priceData of freshPrices) {
-          const price = parseFloat(priceData.price);
-          prices[priceData.tokenContractAddress] = price;
-          
-          // Update cache
-          this.cache.set(priceData.tokenContractAddress, {
-            mint: priceData.tokenContractAddress,
-            price,
-            symbol: priceData.symbol,
-            lastUpdated: new Date()
-          });
-        }
-      } catch (error) {
-        console.error('Failed to fetch token prices:', error);
-        // Return cached prices even if they're stale
-        for (const mint of uncachedMints) {
-          const cached = this.cache.get(mint);
-          if (cached) {
-            prices[mint] = cached.price;
-          }
-        }
+      console.log('Price service: Using Zerion-provided prices from transaction data');
+      // For uncached tokens, return 0 - prices will be populated by Zerion sync
+      for (const mint of uncachedMints) {
+        prices[mint] = 0;
       }
     }
 

@@ -1,8 +1,8 @@
 import { prisma } from './db';
 import { SolanaTransactionParser } from './solana-parser';
 import { solanaClient } from './solana';
-import { okxClient } from './okx-client';
 import { ParsedTrade } from '@/types/trade';
+// Note: OKX client removed - now using Zerion for transaction history
 
 export class TradeImportService {
   private parser: SolanaTransactionParser;
@@ -172,16 +172,13 @@ export class TradeImportService {
 
   private async fetchTokenPrices(tokenMints: string[]): Promise<Record<string, number>> {
     try {
-      const prices = await okxClient.getTokenPrices(tokenMints);
-      const priceMap: Record<string, number> = {};
+      // Note: Price fetching now handled by Zerion during sync
+      console.log('Price fetching now handled by Zerion API during transaction sync');
       
-      for (const price of prices) {
-        priceMap[price.tokenContractAddress] = parseFloat(price.price);
-      }
-      
-      return priceMap;
+      // Return empty price map - prices are now handled by Zerion
+      return {};
     } catch (error) {
-      console.error('Failed to fetch token prices:', error);
+      console.error('Token price fetch note:', error);
       return {};
     }
   }

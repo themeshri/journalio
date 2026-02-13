@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { ImportTrigger } from '@/components/import/import-trigger';
-import { OKXSyncDashboard } from '@/components/okx/okx-sync-dashboard';
+// TODO: Create Zerion sync dashboard component
 
 interface WalletPageProps {
   params: Promise<{ walletId: string }>;
@@ -100,10 +100,16 @@ export default async function WalletPage({ params }: WalletPageProps) {
           }}
         />
         
-        <OKXSyncDashboard 
-          walletId={wallet.id}
-          walletAddress={wallet.address}
-        />
+        {/* Zerion sync functionality available through main sync interface */}
+        <div className="p-4 border rounded-lg bg-blue-50">
+          <h3 className="font-medium mb-2">Transaction Sync</h3>
+          <p className="text-sm text-muted-foreground mb-3">
+            Sync transactions using Zerion API for superior data quality and price coverage
+          </p>
+          <Button asChild size="sm">
+            <Link href="/dashboard/import">Go to Sync Dashboard</Link>
+          </Button>
+        </div>
       </div>
 
       <Card>

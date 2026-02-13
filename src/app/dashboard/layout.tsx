@@ -1,6 +1,5 @@
 import { requireAuth } from '@/lib/auth';
-import { Header } from '@/components/navigation/header';
-import { Sidebar } from '@/components/navigation/sidebar';
+import { AppLayout } from '@/components/layout/app-layout';
 
 export default async function DashboardLayout({
   children,
@@ -8,21 +7,24 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   // In development, skip auth completely to avoid any errors
+  let user = undefined;
+  
   if (process.env.NODE_ENV === 'development' || process.env.BYPASS_AUTH === 'true') {
-    // Skip authentication in development
+    // Mock user for development
+    user = {
+      name: 'Demo Trader',
+      email: 'trader@chainjournal.com',
+      avatarUrl: undefined
+    };
   } else {
-    await requireAuth(); // Only protect routes in production
+    // Get real user in production
+    await requireAuth();
+    // TODO: Fetch actual user data from Clerk
   }
   
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6">
-          {children}
-        </main>
-      </div>
-    </div>
+    <AppLayout user={user}>
+      {children}
+    </AppLayout>
   );
 }

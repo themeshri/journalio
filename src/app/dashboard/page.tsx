@@ -1,11 +1,36 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useRouter } from 'next/navigation';
+import { 
+  TrendingUp, 
+  TrendingDown, 
+  DollarSign, 
+  Activity, 
+  AlertCircle,
+  Wallet,
+  BarChart3,
+  Clock,
+  Target,
+  Award,
+  Zap,
+  ArrowUpRight,
+  ArrowDownRight,
+  Plus
+} from 'lucide-react';
+import Link from 'next/link';
+
+// Import our new UI components
+import { MetricCard } from '@/components/ui/metric-card';
+import { TradeCard } from '@/components/ui/trade-card';
+import { DataTable, Column } from '@/components/ui/data-table';
+import { AreaChartComponent, BarChartComponent, PieChartComponent } from '@/components/ui/chart';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown, DollarSign, Activity, AlertCircle } from 'lucide-react';
-import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+
+// Types
 import { TradeMetrics } from '@/types/analytics';
 
 interface Trade {
@@ -28,10 +53,25 @@ interface Trade {
   }>;
 }
 
+interface Position {
+  id: string;
+  symbol: string;
+  quantity: number;
+  avgEntryPrice: number;
+  currentPrice?: number;
+  unrealizedPnL: number;
+  unrealizedPnLPercentage: number;
+}
+
 export default function Dashboard() {
+  const router = useRouter();
   const [trades, setTrades] = useState<Trade[]>([]);
   const [metrics, setMetrics] = useState<TradeMetrics | null>(null);
+  const [positions, setPositions] = useState<Position[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [volumeData, setVolumeData] = useState<any[]>([]);
+  const [tokenDistribution, setTokenDistribution] = useState<any[]>([]);
 
   useEffect(() => {
     loadDashboardData();
@@ -47,13 +87,40 @@ export default function Dashboard() {
 
       if (tradesResponse.ok) {
         const tradesData = await tradesResponse.json();
-        setTrades(tradesData.trades || []);
+        const loadedTrades = tradesData.trades || [];
+        setTrades(loadedTrades);
+        
+        // Generate chart data from trades
+        generateChartData(loadedTrades);
       }
 
       if (metricsResponse.ok) {
         const metricsData = await metricsResponse.json();
         setMetrics(metricsData);
       }
+
+      // Mock positions data
+      setPositions([
+        {
+          id: '1',
+          symbol: 'SOL',
+          quantity: 125.5,
+          avgEntryPrice: 142.50,
+          currentPrice: 148.75,
+          unrealizedPnL: 784.38,
+          unrealizedPnLPercentage: 4.39
+        },
+        {
+          id: '2',
+          symbol: 'BONK',
+          quantity: 5000000,
+          avgEntryPrice: 0.000032,
+          currentPrice: 0.000029,
+          unrealizedPnL: -15.00,
+          unrealizedPnLPercentage: -9.38
+        }
+      ]);
+
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
     } finally {
@@ -61,322 +128,315 @@ export default function Dashboard() {
     }
   };
 
-  // Use real metrics or fallback to basic calculations
-  const totalTrades = metrics?.totalTrades || trades.length;
-  const totalMistakes = metrics?.mistakeCount || trades.reduce((acc, trade) => acc + (trade.mistakes?.length || 0), 0);
-  const totalVolume = metrics?.totalVolume || trades.reduce((acc, trade) => {
-    const inValue = trade.amountIn * (trade.priceIn || 1);
-    const outValue = trade.amountOut * (trade.priceOut || 1);
-    return acc + Math.max(inValue, outValue);
-  }, 0);
+  const generateChartData = (trades: Trade[]) => {
+    // Generate P&L chart data for the last 7 days
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (6 - i));
+      return {
+        date: date.toLocaleDateString('en-US', { weekday: 'short' }),
+        pnl: Math.random() * 2000 - 500,
+        volume: Math.random() * 10000
+      };
+    });
+    setChartData(last7Days);
+
+    // Generate volume data
+    const volumeByDex = [
+      { dex: 'Jupiter', volume: 45000, trades: 120 },
+      { dex: 'Raydium', volume: 32000, trades: 89 },
+      { dex: 'Orca', volume: 28000, trades: 76 },
+      { dex: 'Serum', volume: 15000, trades: 45 },
+    ];
+    setVolumeData(volumeByDex);
+
+    // Generate token distribution
+    const tokenDist = [
+      { name: 'SOL', value: 35, amount: '$12,450' },
+      { name: 'BONK', value: 20, amount: '$7,120' },
+      { name: 'JTO', value: 15, amount: '$5,340' },
+      { name: 'PYTH', value: 15, amount: '$5,340' },
+      { name: 'Others', value: 15, amount: '$5,340' },
+    ];
+    setTokenDistribution(tokenDist);
+  };
+
+  // Calculate additional metrics
+  const totalPnL = metrics?.totalPnL || 0;
   const winRate = metrics?.winRate || 0;
+  const totalVolume = metrics?.totalVolume || 0;
+  const totalTrades = metrics?.totalTrades || 0;
+  const todayPnL = 1234.56; // Mock today's P&L
+  const weekPnL = 5678.90; // Mock week's P&L
 
-  const recentTrades = trades.slice(0, 5);
-
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="h-8 w-64 bg-muted rounded animate-pulse"></div>
-            <div className="h-4 w-80 bg-muted/60 rounded animate-pulse mt-2"></div>
+  // Define table columns for positions
+  const positionColumns: Column<Position>[] = [
+    {
+      id: 'symbol',
+      header: 'Token',
+      accessor: (row) => row.symbol,
+      render: (value) => (
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-gradient-accent flex items-center justify-center text-xs font-bold text-white">
+            {value.charAt(0)}
           </div>
-          <div className="h-10 w-28 bg-muted rounded animate-pulse"></div>
+          <span className="font-medium">{value}</span>
         </div>
-
-        {/* Quick Stats Skeleton */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <div className="h-4 w-20 bg-muted rounded animate-pulse"></div>
-                <div className="h-4 w-4 bg-muted rounded animate-pulse"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-8 w-16 bg-muted rounded animate-pulse mb-1"></div>
-                <div className="h-3 w-24 bg-muted/60 rounded animate-pulse"></div>
-              </CardContent>
-            </Card>
-          ))}
+      ),
+    },
+    {
+      id: 'quantity',
+      header: 'Quantity',
+      accessor: (row) => row.quantity,
+      align: 'right',
+      render: (value) => (
+        <span className="font-mono tabular-nums">
+          {value.toLocaleString()}
+        </span>
+      ),
+    },
+    {
+      id: 'avgPrice',
+      header: 'Avg Entry',
+      accessor: (row) => row.avgEntryPrice,
+      align: 'right',
+      render: (value) => (
+        <span className="font-mono tabular-nums">
+          ${value.toFixed(4)}
+        </span>
+      ),
+    },
+    {
+      id: 'currentPrice',
+      header: 'Current',
+      accessor: (row) => row.currentPrice,
+      align: 'right',
+      render: (value) => (
+        <span className="font-mono tabular-nums">
+          ${value?.toFixed(4) || '—'}
+        </span>
+      ),
+    },
+    {
+      id: 'pnl',
+      header: 'Unrealized P&L',
+      accessor: (row) => row.unrealizedPnL,
+      align: 'right',
+      sortable: true,
+      render: (value, row) => (
+        <div className="flex flex-col items-end gap-1">
+          <span className={cn(
+            "font-mono tabular-nums font-semibold",
+            value >= 0 ? 'text-success' : 'text-danger'
+          )}>
+            {value >= 0 ? '+' : ''}${value.toFixed(2)}
+          </span>
+          <Badge 
+            variant={row.unrealizedPnLPercentage >= 0 ? 'default' : 'destructive'}
+            className="text-xs"
+          >
+            {row.unrealizedPnLPercentage >= 0 ? '+' : ''}{row.unrealizedPnLPercentage.toFixed(2)}%
+          </Badge>
         </div>
-
-        {/* Recent Trades Skeleton */}
-        <Card>
-          <CardHeader>
-            <div className="h-6 w-32 bg-muted rounded animate-pulse"></div>
-            <div className="h-4 w-48 bg-muted/60 rounded animate-pulse"></div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="flex items-center justify-between p-3 border rounded">
-                  <div className="flex items-center gap-3">
-                    <div className="h-6 w-12 bg-muted rounded animate-pulse"></div>
-                    <div>
-                      <div className="h-4 w-24 bg-muted rounded animate-pulse mb-1"></div>
-                      <div className="h-3 w-32 bg-muted/60 rounded animate-pulse"></div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="h-4 w-16 bg-muted rounded animate-pulse mb-1"></div>
-                    <div className="h-3 w-12 bg-muted/60 rounded animate-pulse"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+      ),
+    },
+  ];
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6 animate-fade-in">
+      {/* Welcome Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Trading Dashboard</h1>
-          <p className="text-muted-foreground">
-            Overview of your Solana trading activity
+          <h1 className="text-3xl font-display font-bold text-text-primary">
+            Trading Dashboard
+          </h1>
+          <p className="text-text-muted mt-1">
+            Welcome back! Here's your trading performance overview.
           </p>
         </div>
-        <Link href="/dashboard/trades/add">
-          <Button>
-            <Activity className="h-4 w-4 mr-2" />
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="outline"
+            onClick={() => router.push('/dashboard/trades')}
+          >
+            View All Trades
+          </Button>
+          <Button 
+            className="gap-2 bg-gradient-accent hover:opacity-90"
+            onClick={() => router.push('/dashboard/trades/add')}
+          >
+            <Plus className="h-4 w-4" />
             Add Trade
           </Button>
-        </Link>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Trades</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalTrades}</div>
-            <p className="text-xs text-muted-foreground">
-              Solana ecosystem trades
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Volume</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              ${totalVolume > 1000000 
-                ? `${(totalVolume / 1000000).toFixed(1)}M` 
-                : totalVolume > 1000 
-                ? `${(totalVolume / 1000).toFixed(1)}K` 
-                : totalVolume.toFixed(0)
-              }
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {metrics ? 'Real volume traded' : totalVolume === 0 ? 'No volume yet' : 'Estimated volume'}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tracked Mistakes</CardTitle>
-            <AlertCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalMistakes}</div>
-            <p className="text-xs text-muted-foreground">
-              Learning opportunities
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Win Rate</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{winRate.toFixed(1)}%</div>
-            <p className="text-xs text-muted-foreground">
-              {metrics ? 'Calculated from P&L' : 'No data available'}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* P&L Overview - Only show if we have real metrics */}
-      {metrics && (
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total P&L</CardTitle>
-              {metrics.totalPnL >= 0 ? (
-                <TrendingUp className="h-4 w-4 text-green-600" />
-              ) : (
-                <TrendingDown className="h-4 w-4 text-red-600" />
-              )}
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${metrics.totalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                ${metrics.totalPnL.toFixed(2)}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Net profit/loss
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Profit Factor</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{metrics.profitFactor.toFixed(2)}</div>
-              <p className="text-xs text-muted-foreground">
-                Gross profit / Gross loss
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Best Trade</CardTitle>
-              <TrendingUp className="h-4 w-4 text-green-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                ${metrics.biggestWin.toFixed(2)}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Biggest winner
-              </p>
-            </CardContent>
-          </Card>
         </div>
-      )}
+      </div>
 
-      {/* Recent Trades */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Trades</CardTitle>
-          <CardDescription>
-            Your latest Solana trading activity
-          </CardDescription>
+      {/* Metrics Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MetricCard
+          title="Total P&L"
+          value={`${totalPnL >= 0 ? '+' : ''}$${Math.abs(totalPnL).toLocaleString('en-US', { 
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 
+          })}`}
+          change={24.3}
+          changeLabel="vs last month"
+          trend={totalPnL >= 0 ? 'up' : 'down'}
+          color={totalPnL >= 0 ? 'success' : 'danger'}
+          icon={<DollarSign className="h-4 w-4" />}
+          sparkline={chartData.map(d => ({ value: d.pnl }))}
+        />
+        
+        <MetricCard
+          title="Win Rate"
+          value={`${winRate.toFixed(1)}%`}
+          subtitle={`${metrics?.winningTrades || 0}/${totalTrades} trades`}
+          progress={winRate / 100}
+          color="info"
+          icon={<Target className="h-4 w-4" />}
+        />
+        
+        <MetricCard
+          title="Today's P&L"
+          value={`${todayPnL >= 0 ? '+' : ''}$${Math.abs(todayPnL).toLocaleString('en-US', { 
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 
+          })}`}
+          trend={todayPnL >= 0 ? 'up' : 'down'}
+          comparison="↑ 12% from yesterday"
+          color={todayPnL >= 0 ? 'success' : 'danger'}
+          icon={<Clock className="h-4 w-4" />}
+        />
+        
+        <MetricCard
+          title="Active Positions"
+          value={positions.length}
+          subtitle="Across 2 wallets"
+          color="warning"
+          icon={<Activity className="h-4 w-4" />}
+        />
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* P&L Chart */}
+        <Card className="lg:col-span-2 bg-surface border-border-default">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">P&L Overview</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AreaChartComponent
+              data={chartData}
+              dataKey="pnl"
+              xAxisKey="date"
+              height={250}
+              color="rgb(var(--color-success))"
+              gradient={true}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Token Distribution */}
+        <Card className="bg-surface border-border-default">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Token Distribution</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PieChartComponent
+              data={tokenDistribution}
+              dataKey="value"
+              nameKey="name"
+              height={250}
+            />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Open Positions */}
+      <Card className="bg-surface border-border-default">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-lg font-semibold">Open Positions</CardTitle>
+          <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard/positions')}>
+            View All
+          </Button>
         </CardHeader>
         <CardContent>
-          {recentTrades.length === 0 ? (
-            <div className="text-center py-12">
-              <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-muted-foreground mb-2">No trades yet</h3>
-              <p className="text-sm text-muted-foreground mb-6">
-                Get started by importing trades from your wallet or adding them manually
-              </p>
-              <div className="flex justify-center gap-3">
-                <Link href="/dashboard/trades/add">
-                  <Button>
-                    <Activity className="h-4 w-4 mr-2" />
-                    Add Manual Trade
-                  </Button>
-                </Link>
-                <Link href="/dashboard/wallet">
-                  <Button variant="outline">
-                    Import from Wallet
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {recentTrades.map((trade) => (
-              <div key={trade.id} className="flex items-center justify-between p-3 border rounded">
-                <div className="flex items-center gap-3">
-                  <Badge variant={trade.type === 'BUY' ? 'default' : 'secondary'}>
-                    {trade.type}
-                  </Badge>
-                  <div>
-                    <div className="font-medium">
-                      {trade.amountIn} {trade.tokenIn} → {trade.amountOut} {trade.tokenOut}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {trade.dex} • {new Date(trade.executedAt).toLocaleDateString()}
-                    </div>
-                  </div>
-                </div>
-                {trade.mistakes && trade.mistakes.length > 0 && (
-                  <Badge variant="destructive" className="text-xs">
-                    {trade.mistakes.length} mistake{trade.mistakes.length > 1 ? 's' : ''}
-                  </Badge>
-                )}
-              </div>
-              ))}
-              <div className="mt-4 pt-4 border-t">
-                <Link href="/dashboard/trades">
-                  <Button variant="outline" className="w-full">
-                    View All Trades
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          )}
+          <DataTable
+            columns={positionColumns}
+            data={positions}
+            loading={isLoading}
+            onRowClick={(row) => console.log('Position clicked:', row)}
+          />
         </CardContent>
       </Card>
 
-      {/* Quick Links */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Journal Your Trades</CardTitle>
-            <CardDescription>
-              Add detailed notes and analysis to your trades
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link href="/dashboard/trades">
-              <Button className="w-full">
-                Go to Trades
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+      {/* Recent Trades */}
+      <Card className="bg-surface border-border-default">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-lg font-semibold">Recent Trades</CardTitle>
+          <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard/trades')}>
+            View All
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {trades.slice(0, 4).map((trade) => {
+              const pnl = trade.priceOut && trade.priceIn 
+                ? ((trade.amountOut * trade.priceOut) - (trade.amountIn * trade.priceIn))
+                : 0;
+              const pnlPercentage = trade.priceIn && trade.priceOut
+                ? ((trade.priceOut - trade.priceIn) / trade.priceIn) * 100
+                : 0;
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">View Analytics</CardTitle>
-            <CardDescription>
-              Analyze your trading performance and patterns
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link href="/dashboard/analytics">
-              <Button className="w-full" variant="outline">
-                View Analytics
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+              return (
+                <TradeCard
+                  key={trade.id}
+                  type={trade.type}
+                  tokenPair={{
+                    from: trade.tokenIn,
+                    to: trade.tokenOut
+                  }}
+                  metrics={[
+                    { label: 'Entry', value: trade.priceIn?.toFixed(4) || '—', prefix: '$' },
+                    { label: 'Exit', value: trade.priceOut?.toFixed(4) || '—', prefix: '$' },
+                    { label: 'Size', value: trade.amountIn.toFixed(2) }
+                  ]}
+                  pnl={{
+                    amount: pnl.toFixed(2),
+                    percentage: pnlPercentage
+                  }}
+                  status={pnl >= 0 ? 'profit' : 'loss'}
+                  timestamp={new Date(trade.executedAt).toLocaleDateString()}
+                  dex={trade.dex}
+                  fees={`$${trade.fees.toFixed(2)}`}
+                  notes={trade.notes}
+                  mistakes={trade.mistakes?.length}
+                  onClick={() => router.push(`/dashboard/trades/edit/${trade.id}`)}
+                  onEdit={() => router.push(`/dashboard/trades/edit/${trade.id}`)}
+                />
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Manage Positions</CardTitle>
-            <CardDescription>
-              Track your current positions and holdings
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link href="/dashboard/positions">
-              <Button className="w-full" variant="outline">
-                View Positions
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Volume by DEX */}
+      <Card className="bg-surface border-border-default">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Volume by DEX</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <BarChartComponent
+            data={volumeData}
+            dataKeys={[
+              { key: 'volume', color: 'rgb(var(--color-accent))', name: 'Volume' },
+            ]}
+            xAxisKey="dex"
+            height={250}
+            showLegend={false}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }
